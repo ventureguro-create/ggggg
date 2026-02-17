@@ -215,5 +215,22 @@ export function buildApp(): FastifyInstance {
     }
   });
 
+  // Register Telegram Discovery Module (Isolated)
+  app.register(async (fastify) => {
+    const telegramEnabled = process.env.TELEGRAM_DISCOVERY_ENABLED !== 'false';
+    if (telegramEnabled) {
+      console.log('[BOOT] Registering telegram-discovery module...');
+      try {
+        const { initTelegramDiscoveryModule } = await import('./modules/telegram-discovery/index.js');
+        await initTelegramDiscoveryModule(fastify);
+        console.log('[BOOT] Telegram Discovery module registered successfully');
+      } catch (err) {
+        console.error('[BOOT] Failed to register telegram-discovery module:', err);
+      }
+    } else {
+      console.log('[BOOT] Telegram Discovery module disabled');
+    }
+  });
+
   return app;
 }
