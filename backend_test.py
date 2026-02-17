@@ -50,17 +50,21 @@ class TelegramDiscoveryTester:
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
         if not headers:
-            headers = {'Content-Type': 'application/json'}
+            headers = {}
         
         try:
             if method == 'GET':
-                response = requests.get(url, headers=headers, timeout=30)
+                response = requests.get(url, timeout=30)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers, timeout=30)
+                if data is not None:
+                    response = requests.post(url, json=data, timeout=30)
+                else:
+                    # For POST with no body, don't set content-type
+                    response = requests.post(url, timeout=30)
             elif method == 'PATCH':
-                response = requests.patch(url, json=data, headers=headers, timeout=30)
+                response = requests.patch(url, json=data, timeout=30)
             elif method == 'PUT':
-                response = requests.put(url, json=data, headers=headers, timeout=30)
+                response = requests.put(url, json=data, timeout=30)
             else:
                 raise ValueError(f"Unsupported method: {method}")
 
