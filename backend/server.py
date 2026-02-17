@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 import httpx
 import os
 
-app = FastAPI(title="Connections API Proxy")
+app = FastAPI(title="Telegram Discovery API Proxy")
 
 # CORS
 app.add_middleware(
@@ -20,6 +20,10 @@ app.add_middleware(
 )
 
 NODE_BACKEND_URL = os.environ.get("NODE_BACKEND_URL", "http://localhost:8003")
+
+# MongoDB connection for direct Python access if needed
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME", "telegram_dev")
 
 @app.get("/api/health")
 async def health():
