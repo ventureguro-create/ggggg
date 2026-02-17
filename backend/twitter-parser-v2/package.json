@@ -1,0 +1,32 @@
+{
+  "name": "twitter-parser-v2",
+  "version": "2.0.0",
+  "description": "Twitter Parser with Playwright + Cookie Sessions + Proxy Support",
+  "main": "src/server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "export-cookies": "tsx src/tools/export-cookies.ts",
+    "test-session": "tsx src/tools/test-session.ts",
+    "refresh-once": "tsx src/tools/auto-refresh.ts --once",
+    "refresh-session": "tsx src/tools/auto-refresh.ts --session",
+    "refresh-daemon": "tsx src/tools/auto-refresh.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.5.0",
+    "playwright": "^1.40.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.0"
+  }
+}

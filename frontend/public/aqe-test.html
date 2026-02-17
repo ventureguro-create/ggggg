@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQE Component Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .container {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .aqe-bar {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+        }
+        .aqe-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .aqe-title {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+        .aqe-score {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #374151;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: all 0.5s ease;
+        }
+        .bg-green-500 { background: #10b981; }
+        .bg-yellow-500 { background: #f59e0b; }
+        .bg-red-500 { background: #ef4444; }
+        .aqe-details {
+            display: flex;
+            justify-content: between;
+            font-size: 12px;
+        }
+        .text-red-400 { color: #f87171; }
+        .text-yellow-400 { color: #fbbf24; }
+        .text-green-400 { color: #4ade80; }
+        .text-gray-300 { color: #d1d5db; }
+        .text-gray-400 { color: #9ca3af; }
+        .anomaly {
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(217, 119, 6, 0.3);
+            border-radius: 4px;
+            font-size: 12px;
+            color: #fbbf24;
+        }
+        .suspicious {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #374151;
+        }
+        .suspicious-title {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+        .suspicious-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .suspicious-item {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .bg-red-900 { background: rgba(127, 29, 29, 0.5); color: #fca5a5; }
+        .bg-orange-900 { background: rgba(154, 52, 18, 0.5); color: #fdba74; }
+    </style>
+</head>
+<body>
+    <h1>AQE Component Test</h1>
+    <p>Testing the Audience Quality Engine component with real data from the API</p>
+    
+    <div id="aqe-container">
+        <div class="container">
+            <h3>Loading AQE data...</h3>
+        </div>
+    </div>
+
+    <script>
+        // Function to render AQE component (simplified version of React component)
+        function renderAQE(aqe) {
+            if (!aqe) return '<div>No AQE data available</div>';
+            
+            const realPct = Math.round((aqe.real_audience_pct || 0) * 100);
+            const botPct = Math.round((aqe.bot_pressure_pct || 0) * 100);
+            
+            let barClass = 'bg-red-500';
+            if (realPct >= 75) barClass = 'bg-green-500';
+            else if (realPct >= 55) barClass = 'bg-yellow-500';
+            
+            let confClass = 'text-gray-400';
+            switch (aqe.confidence_level) {
+                case 'HIGH': confClass = 'text-green-400'; break;
+                case 'MEDIUM': confClass = 'text-yellow-400'; break;
+                case 'LOW': confClass = 'text-red-400'; break;
+            }
+            
+            let suspiciousFollowers = '';
+            if (aqe.topSuspiciousFollowers && aqe.topSuspiciousFollowers.length > 0) {
+                const followers = aqe.topSuspiciousFollowers.slice(0, 3).map(f => {
+                    const bgClass = f.label === 'FARM_NODE' ? 'bg-red-900' : 'bg-orange-900';
+                    const username = f.username || f.followerId.slice(0, 8);
+                    return `<span class="suspicious-item ${bgClass}">@${username}</span>`;
+                }).join('');
+                
+                suspiciousFollowers = `
+                    <div class="suspicious">
+                        <div class="suspicious-title">Suspicious Followers</div>
+                        <div class="suspicious-list">${followers}</div>
+                    </div>
+                `;
+            }
+            
+            let anomalyAlert = '';
+            if (aqe.anomaly && aqe.anomaly.anomaly) {
+                anomalyAlert = '<div class="anomaly">Growth anomaly detected</div>';
+            }
+            
+            return `
+                <div class="aqe-bar">
+                    <div class="aqe-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="aqe-title">Audience Quality</span>
+                        <span class="aqe-score">${realPct}%</span>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill ${barClass}" style="width: ${realPct}%"></div>
+                    </div>
+                    
+                    <div class="aqe-details" style="display: flex; justify-content: space-between;">
+                        <div>
+                            <span class="text-gray-400">Bot Pressure: </span>
+                            <span class="${botPct > 30 ? 'text-red-400' : 'text-gray-300'}">${botPct}%</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">Confidence: </span>
+                            <span class="${confClass}">${aqe.confidence_level}</span>
+                        </div>
+                    </div>
+                    
+                    ${anomalyAlert}
+                    ${suspiciousFollowers}
+                    
+                    <div style="margin-top: 12px; font-size: 11px; color: #6b7280;">
+                        Sampled ${aqe.sampledFollowers || 0} followers
+                        ${aqe.breakdown ? ` | REAL: ${aqe.breakdown.real}, LOW_QUALITY: ${aqe.breakdown.low_quality}, BOT_LIKELY: ${aqe.breakdown.bot_likely}, FARM_NODE: ${aqe.breakdown.farm_node}` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Test with different actor IDs
+        async function testAQE() {
+            const testActorId = 'test_actor_123';
+            const container = document.getElementById('aqe-container');
+            
+            try {
+                container.innerHTML = '<div class="container"><h3>Fetching AQE data...</h3></div>';
+                
+                const response = await fetch(`/api/connections/audience-quality/${testActorId}`);
+                const result = await response.json();
+                
+                if (result.ok && result.data) {
+                    container.innerHTML = `
+                        <div class="container">
+                            <h3>AQE Component - Full Data</h3>
+                            ${renderAQE(result.data)}
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="container">
+                            <h3>Error loading AQE data</h3>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+                
+                // Also test summary endpoint
+                const summaryResponse = await fetch(`/api/connections/audience-quality/${testActorId}/summary`);
+                const summaryResult = await summaryResponse.json();
+                
+                if (summaryResult.ok && summaryResult.data) {
+                    container.innerHTML += `
+                        <div class="container">
+                            <h3>AQE Component - Summary (Compact)</h3>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                                <span class="text-gray-400">AQ:</span>
+                                <span class="${Math.round(summaryResult.data.real_audience_pct * 100) >= 70 ? 'text-green-400' : Math.round(summaryResult.data.real_audience_pct * 100) >= 50 ? 'text-yellow-400' : 'text-red-400'}">
+                                    ${Math.round(summaryResult.data.real_audience_pct * 100)}%
+                                </span>
+                                ${Math.round(summaryResult.data.bot_pressure_pct * 100) > 20 ? 
+                                    `<span class="text-red-400">(${Math.round(summaryResult.data.bot_pressure_pct * 100)}% bot)</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="container">
+                        <h3>Error</h3>
+                        <p style="color: #ef4444;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Run test when page loads
+        testAQE();
+    </script>
+</body>
+</html>

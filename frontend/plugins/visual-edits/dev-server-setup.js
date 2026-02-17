@@ -703,8 +703,7 @@ function setupDevServer(config) {
                   });
                 } else if (
                   change.type === "textContent" &&
-                  (Array.isArray(change.textParts) ||
-                    change.textContent !== undefined)
+                  change.textContent !== undefined
                 ) {
                   console.log(
                     `[backend] Processing textContent change:`,
@@ -716,110 +715,56 @@ function setupDevServer(config) {
                     const jsxElementNode = parentElementPath.node;
                     const children = jsxElementNode.children || [];
 
-                    const textParts = Array.isArray(change.textParts)
-                      ? change.textParts
-                      : null;
-
-                    if (textParts) {
-                      const textLikeNodes = children.filter(
-                        (child) =>
-                          t.isJSXText(child) ||
-                          (t.isJSXExpressionContainer(child) &&
-                            t.isStringLiteral(child.expression)),
-                      );
-
-                      const oldContent = textLikeNodes
-                        .map((child) => {
-                          if (t.isJSXText(child)) return child.value || "";
-                          if (
-                            t.isJSXExpressionContainer(child) &&
-                            t.isStringLiteral(child.expression)
-                          ) {
-                            return child.expression.value || "";
-                          }
-                          return "";
-                        })
-                        .join("");
-
-                      textLikeNodes.forEach((child, index) => {
-                        const nextValue = textParts[index] ?? "";
-                        if (t.isJSXText(child)) {
-                          child.value = nextValue;
-                        } else if (
-                          t.isJSXExpressionContainer(child) &&
-                          t.isStringLiteral(child.expression)
-                        ) {
-                          child.expression.value = nextValue;
-                        }
-                      });
-
-                      if (textParts.length > textLikeNodes.length) {
-                        const extraNodes = textParts
-                          .slice(textLikeNodes.length)
-                          .map((part) => t.jsxText(part ?? ""));
-                        jsxElementNode.children = [...children, ...extraNodes];
+                    let targetTextNode = null;
+                    for (const child of children) {
+                      if (t.isJSXText(child) && child.value.trim().length > 0) {
+                        targetTextNode = child;
+                        break;
                       }
-
-                      edits.push({
-                        file: getRelativePath(targetFile),
-                        lineNumber: lineNumber,
-                        element: elementName,
-                        type: "textContent",
-                        oldData: oldContent,
-                        newData: textParts.join(""),
-                      });
-                    } else {
-                      let targetTextNode = null;
-                      for (const child of children) {
-                        if (t.isJSXText(child) && child.value.trim().length > 0) {
-                          targetTextNode = child;
-                          break;
-                        }
-                      }
-
-                      const firstTextNode = targetTextNode;
-                      const fallbackWhitespaceNode = children.find(
-                        (child) => t.isJSXText(child) && child.value.trim().length === 0,
-                      );
-
-                      const newContent = change.textContent;
-                      let oldContent = "";
-
-                      const preserveWhitespace = (originalValue, updatedCore) => {
-                        const leadingWhitespace =
-                          (originalValue.match(/^\s*/) || [""])[0];
-                        const trailingWhitespace =
-                          (originalValue.match(/\s*$/) || [""])[0];
-                        return `${leadingWhitespace}${updatedCore}${trailingWhitespace}`;
-                      };
-
-                      if (firstTextNode) {
-                        oldContent = firstTextNode.value.trim();
-                        firstTextNode.value = preserveWhitespace(
-                          firstTextNode.value,
-                          newContent,
-                        );
-                      } else if (fallbackWhitespaceNode) {
-                        oldContent = "";
-                        fallbackWhitespaceNode.value = preserveWhitespace(
-                          fallbackWhitespaceNode.value,
-                          newContent,
-                        );
-                      } else {
-                        oldContent = "";
-                        const newTextNode = t.jsxText(newContent);
-                        jsxElementNode.children = [newTextNode, ...children];
-                      }
-
-                      edits.push({
-                        file: getRelativePath(targetFile),
-                        lineNumber: lineNumber,
-                        element: elementName,
-                        type: "textContent",
-                        oldData: oldContent,
-                        newData: newContent,
-                      });
                     }
+
+                    const firstTextNode = targetTextNode;
+                    const fallbackWhitespaceNode = children.find(
+                      (child) => t.isJSXText(child) && child.value.trim().length === 0,
+                    );
+
+                    const newContent = change.textContent;
+                    let oldContent = "";
+
+                    const preserveWhitespace = (originalValue, updatedCore) => {
+                      const leadingWhitespace =
+                        (originalValue.match(/^\s*/) || [""])[0];
+                      const trailingWhitespace =
+                        (originalValue.match(/\s*$/) || [""])[0];
+                      return `${leadingWhitespace}${updatedCore}${trailingWhitespace}`;
+                    };
+
+                    if (firstTextNode) {
+                      oldContent = firstTextNode.value.trim();
+                      firstTextNode.value = preserveWhitespace(
+                        firstTextNode.value,
+                        newContent,
+                      );
+                    } else if (fallbackWhitespaceNode) {
+                      oldContent = "";
+                      fallbackWhitespaceNode.value = preserveWhitespace(
+                        fallbackWhitespaceNode.value,
+                        newContent,
+                      );
+                    } else {
+                      oldContent = "";
+                      const newTextNode = t.jsxText(newContent);
+                      jsxElementNode.children = [newTextNode, ...children];
+                    }
+
+                    edits.push({
+                      file: getRelativePath(targetFile),
+                      lineNumber: lineNumber,
+                      element: elementName,
+                      type: "textContent",
+                      oldData: oldContent,
+                      newData: newContent,
+                    });
                   }
                 } else if (
                   change.type === "content" &&

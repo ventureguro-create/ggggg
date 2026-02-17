@@ -9,7 +9,7 @@ const isDevServer = process.env.NODE_ENV !== "production";
 // Environment variable overrides
 const config = {
   enableHealthCheck: process.env.ENABLE_HEALTH_CHECK === "true",
-  enableVisualEdits: isDevServer, // Only enable during dev server
+  enableVisualEdits: false, // Disabled - plugin causes issues with complex code
 };
 
 // Conditionally load visual edits modules only in dev mode
@@ -99,6 +99,28 @@ webpackConfig.devServer = (devServerConfig) => {
       return middlewares;
     };
   }
+
+  // Disable error overlay for MetaMask/extension errors
+  devServerConfig.client = {
+    ...devServerConfig.client,
+    overlay: {
+      errors: true,
+      warnings: false,
+      runtimeErrors: (error) => {
+        // Suppress MetaMask and browser extension errors
+        const msg = error?.message || '';
+        if (
+          msg.includes('MetaMask') ||
+          msg.includes('Failed to connect') ||
+          msg.includes('chrome-extension://') ||
+          msg.includes('inpage.js')
+        ) {
+          return false;
+        }
+        return true;
+      },
+    },
+  };
 
   return devServerConfig;
 };

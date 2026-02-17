@@ -114,66 +114,6 @@ function isPortalishName(name, RADIX_ROOTS) {
   return RADIX_ROOTS.has(name) || PORTAL_SUFFIX_RE.test(name);
 }
 
-const isStaticLiteralExpression = (expr, t) =>
-  t.isStringLiteral(expr) ||
-  t.isNumericLiteral(expr) ||
-  t.isBooleanLiteral(expr) ||
-  t.isNullLiteral(expr) ||
-  (t.isTemplateLiteral(expr) && expr.expressions.length === 0);
-
-const buildDynamicExpressionWrapper = (child, t) =>
-  t.jsxElement(
-    t.jsxOpeningElement(
-      t.jsxIdentifier("span"),
-      [
-        t.jsxAttribute(
-          t.jsxIdentifier("data-ve-dynamic"),
-          t.stringLiteral("true"),
-        ),
-        t.jsxAttribute(
-          t.jsxIdentifier("x-excluded"),
-          t.stringLiteral("true"),
-        ),
-        t.jsxAttribute(
-          t.jsxIdentifier("style"),
-          t.jsxExpressionContainer(
-            t.objectExpression([
-              t.objectProperty(
-                t.identifier("display"),
-                t.stringLiteral("contents"),
-              ),
-            ]),
-          ),
-        ),
-      ],
-      false,
-    ),
-    t.jsxClosingElement(t.jsxIdentifier("span")),
-    [child],
-    false,
-  );
-
-const wrapDynamicExpressionChildren = (jsxPath, t) => {
-  const children = jsxPath.node.children || [];
-  let didChange = false;
-
-  const nextChildren = children.map((child) => {
-    if (
-      t.isJSXExpressionContainer(child) &&
-      !t.isJSXEmptyExpression(child.expression) &&
-      !isStaticLiteralExpression(child.expression, t)
-    ) {
-      didChange = true;
-      return buildDynamicExpressionWrapper(child, t);
-    }
-    return child;
-  });
-
-  if (didChange) {
-    jsxPath.node.children = nextChildren;
-  }
-};
-
 // Analyze a specific exported component in a file
 function fileExportHasPortals({
   absPath,
@@ -1715,13 +1655,7 @@ const babelMetadataPlugin = ({ types: t }) => {
         if (!elementName) return;
 
         // Only process capitalized components (React components)
-        if (!/^[A-Z]/.test(elementName)) {
-          if (hasProp(openingElement, "data-ve-dynamic") || hasProp(openingElement, "x-excluded")) {
-            return;
-          }
-          wrapDynamicExpressionChildren(jsxPath, t);
-          return;
-        }
+        if (!/^[A-Z]/.test(elementName)) return;
 
         // Exclude components that have strict child requirements or break when wrapped
         const excludedComponents = new Set([
