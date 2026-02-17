@@ -1,144 +1,129 @@
 {
   "summary": {
     "tests_run": 17,
-    "tests_passed": 15,
-    "success_rate": "88.2%"
+    "tests_passed": 17,
+    "success_rate": "100.0%"
   },
-  "failed_tests": [
-    {
-      "name": "Trigger Ranking Calculation",
-      "success": false,
-      "status_code": 400,
-      "timestamp": "2026-02-17T23:52:10.295464",
-      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
-    },
-    {
-      "name": "Calculate Channel Metrics",
-      "success": false,
-      "status_code": 400,
-      "timestamp": "2026-02-17T23:52:10.378357",
-      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
-    }
-  ],
+  "failed_tests": [],
   "all_results": [
     {
       "name": "Proxy Health Check",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:09.879924",
+      "timestamp": "2026-02-17T23:52:23.718588",
       "response_sample": "{'ok': True, 'service': 'proxy', 'nodeBackend': 'http://localhost:8003'}"
     },
     {
       "name": "Telegram Module Health Check",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:09.934735",
-      "response_sample": "{'ok': True, 'module': 'telegram-discovery', 'version': '1.0.0', 'adapter': {'connected': False, 'mode': 'mock'}, 'stats': {'totalChannels': 5, 'activeChannels': 5, 'pendingCandidates': 0, 'totalEdges..."
+      "timestamp": "2026-02-17T23:52:23.749171",
+      "response_sample": "{'ok': True, 'module': 'telegram-discovery', 'version': '1.0.0', 'adapter': {'connected': False, 'mode': 'mock'}, 'stats': {'totalChannels': 6, 'activeChannels': 5, 'pendingCandidates': 0, 'totalEdges..."
     },
     {
       "name": "Get Channels List",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:09.966011",
+      "timestamp": "2026-02-17T23:52:23.777187",
       "response_sample": "{'ok': True, 'data': [{'channelId': 'seed_durov', 'username': 'durov', 'title': 'Pavel Durov', 'status': 'active', 'rankingScore': 35, 'qualityScore': 50, 'fraudScore': 50, 'tags': ['crypto', 'tech'],..."
     },
     {
       "name": "Get Channels with Filters",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:09.997574",
+      "timestamp": "2026-02-17T23:52:23.805229",
       "response_sample": "{'ok': True, 'data': [{'channelId': 'seed_durov', 'username': 'durov', 'title': 'Pavel Durov', 'status': 'active', 'rankingScore': 35, 'qualityScore': 50, 'fraudScore': 50, 'tags': ['crypto', 'tech'],..."
     },
     {
       "name": "Seed New Channel",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.030915",
-      "response_sample": "{'ok': True, 'channelId': 'seed_test_channel_1771372329'}"
+      "timestamp": "2026-02-17T23:52:23.844361",
+      "response_sample": "{'ok': True, 'channelId': 'seed_test_channel_1771372343'}"
     },
     {
       "name": "Get Single Channel Details",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.060187",
-      "response_sample": "{'ok': True, 'data': {'channelId': 'seed_test_channel_1771372329', 'username': 'test_channel_1771372329', 'title': 'Test Channel for API Testing', 'description': 'This is a test channel created during..."
+      "timestamp": "2026-02-17T23:52:23.871467",
+      "response_sample": "{'ok': True, 'data': {'channelId': 'seed_test_channel_1771372343', 'username': 'test_channel_1771372343', 'title': 'Test Channel for API Testing', 'description': 'This is a test channel created during..."
     },
     {
       "name": "Update Channel Status",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.086010",
+      "timestamp": "2026-02-17T23:52:23.896467",
       "response_sample": "{'ok': True}"
     },
     {
       "name": "Get Non-existent Channel",
       "success": true,
       "status_code": 404,
-      "timestamp": "2026-02-17T23:52:10.111907",
+      "timestamp": "2026-02-17T23:52:23.921154",
       "response_sample": "{'ok': False, 'error': 'Channel not found'}"
     },
     {
       "name": "Get Discovery Statistics",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.151067",
-      "response_sample": "{'ok': True, 'data': {'totalChannels': 6, 'activeChannels': 5, 'pendingCandidates': 0, 'totalEdges': 0, 'totalPosts': 0}}"
+      "timestamp": "2026-02-17T23:52:23.956836",
+      "response_sample": "{'ok': True, 'data': {'totalChannels': 7, 'activeChannels': 5, 'pendingCandidates': 0, 'totalEdges': 0, 'totalPosts': 0}}"
     },
     {
       "name": "Get Discovery Candidates",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.185626",
+      "timestamp": "2026-02-17T23:52:23.981253",
       "response_sample": "{'ok': True, 'data': []}"
     },
     {
       "name": "Get Discovery Candidates with Filters",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.216260",
+      "timestamp": "2026-02-17T23:52:24.013988",
       "response_sample": "{'ok': True, 'data': []}"
     },
     {
       "name": "Get Current Rankings",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.242276",
+      "timestamp": "2026-02-17T23:52:24.044392",
       "response_sample": "{'ok': True, 'data': [{'rank': 1, 'channelId': 'seed_durov', 'username': 'durov', 'title': 'Pavel Durov', 'overallScore': 35, 'rankChange': 0, 'subscriberCount': 0}, {'rank': 2, 'channelId': 'seed_fom..."
     },
     {
       "name": "Get Limited Rankings",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.271442",
+      "timestamp": "2026-02-17T23:52:24.071652",
       "response_sample": "{'ok': True, 'data': [{'rank': 1, 'channelId': 'seed_durov', 'username': 'durov', 'title': 'Pavel Durov', 'overallScore': 35, 'rankChange': 0, 'subscriberCount': 0}, {'rank': 2, 'channelId': 'seed_fom..."
     },
     {
       "name": "Trigger Ranking Calculation",
-      "success": false,
-      "status_code": 400,
-      "timestamp": "2026-02-17T23:52:10.295464",
-      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-17T23:52:24.115858",
+      "response_sample": "{'ok': True, 'ranked': 5}"
     },
     {
       "name": "Analyze Channel for Fraud",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.322719",
-      "response_sample": "{'ok': True, 'data': {'channelId': 'seed_test_channel_1771372329', 'fraudScore': 30, 'indicators': {'suspiciousGrowth': False, 'lowEngagement': False, 'irregularPosting': False, 'botLikePatterns': Fal..."
+      "timestamp": "2026-02-17T23:52:24.147308",
+      "response_sample": "{'ok': True, 'data': {'channelId': 'seed_test_channel_1771372343', 'fraudScore': 30, 'indicators': {'suspiciousGrowth': False, 'lowEngagement': False, 'irregularPosting': False, 'botLikePatterns': Fal..."
     },
     {
       "name": "Get Channel Metrics",
       "success": true,
       "status_code": 200,
-      "timestamp": "2026-02-17T23:52:10.350021",
+      "timestamp": "2026-02-17T23:52:24.171578",
       "response_sample": "{'ok': True, 'data': []}"
     },
     {
       "name": "Calculate Channel Metrics",
-      "success": false,
-      "status_code": 400,
-      "timestamp": "2026-02-17T23:52:10.378357",
-      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-17T23:52:24.204137",
+      "response_sample": "{'ok': True, 'metrics': {'subscriberCount': 0, 'subscriberDelta': 0, 'postsCount': 0, 'avgViews': 0, 'engagementRate': 0}}"
     }
   ]
 }
