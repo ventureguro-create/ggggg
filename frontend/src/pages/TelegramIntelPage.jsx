@@ -309,9 +309,9 @@ export default function TelegramIntelPage() {
               </DataCard>
             )}
 
-            {/* Token Mentions */}
+            {/* Token Mentions - Simple Summary */}
             {channelData.mentions?.ok && (
-              <DataCard title={`Token Mentions (${channelData.mentions.totalMentions})`}>
+              <DataCard title={`Token Mentions Summary`}>
                 {channelData.mentions.topTokens?.slice(0, 8).map((t) => (
                   <div key={t.token} className="flex justify-between py-1 text-sm">
                     <span className="font-medium text-gray-900">${t.token}</span>
@@ -324,6 +324,14 @@ export default function TelegramIntelPage() {
               </DataCard>
             )}
           </div>
+
+          {/* Token Mentions Table with Returns */}
+          <TokenMentionsTable 
+            data={tokenMentions}
+            loading={mentionsLoading}
+            showSummary={true}
+            maxRows={50}
+          />
         </div>
       )}
 
