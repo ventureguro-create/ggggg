@@ -16,6 +16,8 @@ export default function TelegramIntelPage() {
   const [alphaStats, setAlphaStats] = useState(null);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [tokenMentions, setTokenMentions] = useState(null);
+  const [mentionsLoading, setMentionsLoading] = useState(false);
 
   // Load health and stats on mount
   useEffect(() => {
