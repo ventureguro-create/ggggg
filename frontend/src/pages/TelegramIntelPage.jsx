@@ -57,6 +57,9 @@ export default function TelegramIntelPage() {
       ]);
 
       setChannelData({ state, metrics, fraud, mentions });
+      
+      // Load detailed token mentions with returns
+      loadTokenMentions(username);
     } catch (err) {
       setError('Failed to load channel data');
     } finally {
