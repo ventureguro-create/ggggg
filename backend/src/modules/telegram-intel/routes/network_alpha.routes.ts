@@ -48,5 +48,27 @@ export const networkAlphaRoutes: FastifyPluginAsync = async (fastify) => {
     return result;
   });
 
+  // ==================== Network Evidence (Block UI-4) ====================
+
+  // Get channel's network alpha evidence - tokens where channel was early
+  fastify.get('/api/telegram-intel/channel/:username/network-evidence', async (req) => {
+    const { username } = req.params as any;
+    const q = (req.query as any) || {};
+    const limit = Math.max(1, Math.min(100, Number(q.limit || 25)));
+
+    const u = String(username).replace(/^@/, '').toLowerCase();
+    return svc.getChannelNetworkEvidence(u, limit);
+  });
+
+  // ==================== Compare Panel (Block UI-5) ====================
+
+  // Get channel's position comparison in the network
+  fastify.get('/api/telegram-intel/channel/:username/compare', async (req) => {
+    const { username } = req.params as any;
+    const u = String(username).replace(/^@/, '').toLowerCase();
+
+    return svc.getChannelCompare(u);
+  });
+
   fastify.log.info('[network-alpha] routes registered');
 };
