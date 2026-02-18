@@ -216,6 +216,7 @@ export default {
   getTopMovers,
   runTemporalSnapshot,
   getChannelExplain,
+  getChannelTokenMentions,
   getAlphaLeaderboard,
   computeAlphaBatch,
   getCredibilityLeaderboard,
