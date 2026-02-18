@@ -1,0 +1,250 @@
+{
+  "summary": {
+    "tests_run": 21,
+    "tests_passed": 8,
+    "success_rate": "38.1%"
+  },
+  "failed_tests": [
+    {
+      "name": "Trigger Network Alpha Computation",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:05.424056",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    },
+    {
+      "name": "Get Network Alpha Details for durov",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:06.555162",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get Network Alpha Details for ETH",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:06.990053",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get Network Alpha Details for BTC",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.124275",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get IntelScore for alpha_channel",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.304281",
+      "response_sample": "{'ok': False, 'error': 'NOT_FOUND', 'message': 'Route not found'}"
+    },
+    {
+      "name": "Get IntelScore for gamma_channel",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.445226",
+      "response_sample": "{'ok': False, 'error': 'NOT_FOUND', 'message': 'Route not found'}"
+    },
+    {
+      "name": "Get IntelScore for durov",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.576427",
+      "response_sample": "{'ok': False, 'error': 'NOT_FOUND', 'message': 'Route not found'}"
+    },
+    {
+      "name": "Trigger Daily Temporal Snapshot",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:07.708813",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    },
+    {
+      "name": "Get Temporal History for alpha_channel",
+      "success": false,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:07.847436",
+      "response_sample": "{'ok': True, 'username': 'alpha_channel', 'days': 90, 'count': 1, 'items': [{'_id': '6995c27e506ddfde5c76f83f', 'username': 'alpha_channel', 'day': '2026-02-18', '__v': 0, 'config': {'key': 'intel_v1'..."
+    },
+    {
+      "name": "Get Temporal History for gamma_channel",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:08.011417",
+      "response_sample": "{'ok': False, 'error': 'no_data'}"
+    },
+    {
+      "name": "Get Temporal History for durov",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:08.151001",
+      "response_sample": "{'ok': False, 'error': 'no_data'}"
+    },
+    {
+      "name": "Admin Network Alpha Computation",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:08.309388",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    },
+    {
+      "name": "Admin Temporal Snapshot",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:08.435716",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    }
+  ],
+  "all_results": [
+    {
+      "name": "Backend Health Check",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:05.246080",
+      "response_sample": "{'ok': True, 'service': 'proxy', 'nodeBackend': 'http://localhost:8002'}"
+    },
+    {
+      "name": "Trigger Network Alpha Computation",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:05.424056",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    },
+    {
+      "name": "Get Network Alpha Top Channels",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:05.621279",
+      "response_sample": "{'ok': True, 'count': 5, 'items': [{'username': 'alpha_channel', 'computedAt': '2026-02-18T13:44:41.190Z', 'createdAt': '2026-02-18T13:44:41.190Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookba..."
+    },
+    {
+      "name": "Get Network Alpha Top Channels (Limited)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:05.814455",
+      "response_sample": "{'ok': True, 'count': 5, 'items': [{'username': 'alpha_channel', 'computedAt': '2026-02-18T13:44:41.190Z', 'createdAt': '2026-02-18T13:44:41.190Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookba..."
+    },
+    {
+      "name": "Get Network Alpha Top Channels (Min Score)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:05.987664",
+      "response_sample": "{'ok': True, 'count': 2, 'items': [{'username': 'alpha_channel', 'computedAt': '2026-02-18T13:44:41.190Z', 'createdAt': '2026-02-18T13:44:41.190Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookba..."
+    },
+    {
+      "name": "Get Network Alpha Details for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:06.192512",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'computedAt': '2026-02-18T13:44:41.190Z', 'createdAt': '2026-02-18T13:44:41.190Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookbackDays': 90, 's..."
+    },
+    {
+      "name": "Get Network Alpha Details for gamma_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:06.364270",
+      "response_sample": "{'ok': True, 'doc': {'username': 'gamma_channel', 'computedAt': '2026-02-18T13:44:41.192Z', 'createdAt': '2026-02-18T13:44:41.192Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookbackDays': 90, 's..."
+    },
+    {
+      "name": "Get Network Alpha Details for durov",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:06.555162",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get Network Alpha Details for ARB",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:06.716693",
+      "response_sample": "{'ok': True, 'doc': {'token': 'ARB', 'channelsCount': 5, 'computedAt': '2026-02-18T13:44:41.181Z', 'createdAt': '2026-02-18T13:44:41.181Z', 'firstMentionAt': '2025-12-30T13:44:35.654Z', 'firstMentions..."
+    },
+    {
+      "name": "Get Network Alpha Details for OP",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:06.846036",
+      "response_sample": "{'ok': True, 'doc': {'token': 'OP', 'channelsCount': 5, 'computedAt': '2026-02-18T13:44:41.188Z', 'createdAt': '2026-02-18T13:44:41.188Z', 'firstMentionAt': '2026-01-09T13:44:35.654Z', 'firstMentions'..."
+    },
+    {
+      "name": "Get Network Alpha Details for ETH",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:06.990053",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get Network Alpha Details for BTC",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.124275",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get IntelScore for alpha_channel",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.304281",
+      "response_sample": "{'ok': False, 'error': 'NOT_FOUND', 'message': 'Route not found'}"
+    },
+    {
+      "name": "Get IntelScore for gamma_channel",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.445226",
+      "response_sample": "{'ok': False, 'error': 'NOT_FOUND', 'message': 'Route not found'}"
+    },
+    {
+      "name": "Get IntelScore for durov",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:07.576427",
+      "response_sample": "{'ok': False, 'error': 'NOT_FOUND', 'message': 'Route not found'}"
+    },
+    {
+      "name": "Trigger Daily Temporal Snapshot",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:07.708813",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    },
+    {
+      "name": "Get Temporal History for alpha_channel",
+      "success": false,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:47:07.847436",
+      "response_sample": "{'ok': True, 'username': 'alpha_channel', 'days': 90, 'count': 1, 'items': [{'_id': '6995c27e506ddfde5c76f83f', 'username': 'alpha_channel', 'day': '2026-02-18', '__v': 0, 'config': {'key': 'intel_v1'..."
+    },
+    {
+      "name": "Get Temporal History for gamma_channel",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:08.011417",
+      "response_sample": "{'ok': False, 'error': 'no_data'}"
+    },
+    {
+      "name": "Get Temporal History for durov",
+      "success": false,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:47:08.151001",
+      "response_sample": "{'ok': False, 'error': 'no_data'}"
+    },
+    {
+      "name": "Admin Network Alpha Computation",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:08.309388",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    },
+    {
+      "name": "Admin Temporal Snapshot",
+      "success": false,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:47:08.435716",
+      "response_sample": "{'ok': False, 'error': 'INTERNAL_ERROR', 'message': \"Body cannot be empty when content-type is set to 'application/json'\"}"
+    }
+  ],
+  "timestamp": "2026-02-18T13:47:08.436642"
+}
