@@ -232,5 +232,22 @@ export function buildApp(): FastifyInstance {
     }
   });
 
+  // Register Telegram Intelligence Module (Production Pipeline)
+  app.register(async (fastify) => {
+    const telegramIntelEnabled = process.env.TELEGRAM_INTEL_ENABLED !== 'false';
+    if (telegramIntelEnabled) {
+      console.log('[BOOT] Registering telegram-intel module...');
+      try {
+        const { telegramIntelPlugin } = await import('./modules/telegram-intel/telegram_intel.plugin.js');
+        await fastify.register(telegramIntelPlugin);
+        console.log('[BOOT] Telegram Intel module registered successfully');
+      } catch (err) {
+        console.error('[BOOT] Failed to register telegram-intel module:', err);
+      }
+    } else {
+      console.log('[BOOT] Telegram Intel module disabled');
+    }
+  });
+
   return app;
 }
