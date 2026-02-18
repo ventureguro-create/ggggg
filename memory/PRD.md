@@ -1,17 +1,15 @@
-# Telegram Discovery Module - PRD
+# Telegram Discovery Module - PRD v2.0
 
 ## Original Problem Statement
-Создать изолированный Telegram Discovery + Ranking модуль который можно:
-- Разрабатывать отдельно
-- Тестировать отдельно
-- Безопасно влить в main
-
-Требования:
-- Backend (Fastify server + Mongo connection)
-- Свои MongoDB коллекции (tg_*)
-- Свой namespace API /api/telegram/*
-- Свои jobs
-- Полная автономность (удаление модуля не ломает систему)
+Создать production-ready изолированный Telegram Discovery + Ranking модуль с:
+- MTProto runtime (mock для разработки)
+- Discovery (seed → expand)
+- Ingestion (посты + профиль)
+- Advanced Metrics layer
+- Fraud detection (статистически осмысленный)
+- Fair Rating engine
+- Category/Topic classification
+- API endpoints
 
 ## Architecture
 
@@ -25,42 +23,53 @@
 ### Module Structure
 ```
 modules/telegram-discovery/
-├── models/          # 6 MongoDB коллекций (tg_*)
-├── services/        # discovery, metrics, ranking, fraud
+├── models/          # 8 MongoDB коллекций (tg_*)
+├── services/        # discovery, metrics, ranking, fraud (advanced)
+├── detectors/       # 8 детекторов
+├── categories/      # category engine + topic vectors
 ├── adapter/         # Telegram API wrapper (mock mode)
 ├── jobs/            # Background jobs
-└── routes/          # API endpoints
+├── routes/          # API endpoints
+└── utils/           # Math, extract helpers
 ```
 
 ## What's Been Implemented
 
-### Date: 2026-02-18
+### Date: 2026-02-18 (Extended)
 
-#### Backend Module (100% Complete)
-- [x] 6 MongoDB models (tg_channels, tg_posts, tg_metrics, tg_rankings, tg_discovery_edges, tg_candidates)
-- [x] Discovery Service (seed channels, discover from posts, candidates queue)
-- [x] Metrics Service (hourly metrics calculation)
-- [x] Ranking Service (daily ranking calculation with scoring formula)
-- [x] Fraud Service (fraud indicators analysis)
-- [x] Telegram Adapter (mock mode for development)
-- [x] 17 API endpoints under /api/telegram/*
-- [x] Background jobs (discovery, metrics, ranking)
-- [x] Module registration in app.ts
-- [x] Full test coverage (100% backend tests passed)
+#### Advanced Detectors (100% Complete)
+- [x] **Promo Detector** - promo density, links block ratio
+- [x] **Burst Detector** - peak clusters, view spikes
+- [x] **Elasticity Detector** - forwards vs views curve
+- [x] **Originality Detector** - copy-paste detection
+- [x] **Forward Composition** - aggregator/repost-feed detection
+- [x] **Language Detector** - RU/UA/EN classification
+- [x] **Source Diversity** - HHI, dominant source, spillover detection
+- [x] **Cross-Reuse Detector** - synchronized network content
 
-#### Tested Endpoints
-- GET /api/telegram/health ✅
-- GET /api/telegram/channels ✅
-- GET /api/telegram/channels/:channelId ✅
-- POST /api/telegram/channels/seed ✅
-- PATCH /api/telegram/channels/:channelId/status ✅
-- GET /api/telegram/discovery/stats ✅
-- GET /api/telegram/discovery/candidates ✅
-- POST /api/telegram/rankings/calculate ✅
-- GET /api/telegram/rankings ✅
-- GET /api/telegram/fraud/analyze/:channelId ✅
-- GET /api/telegram/metrics/:channelId ✅
-- POST /api/telegram/metrics/calculate/:channelId ✅
+#### Advanced Fraud Service
+- Multi-signal fraud detection
+- 12+ fraud indicators
+- Entropy analysis
+- Engagement elasticity
+- Temporal anomalies
+- Network spillover patterns
+
+#### Advanced Rating Service
+- Bayesian smoothing
+- Stability penalties
+- Reliability weighting
+- Promo/originality/feed penalties
+- Source diversity penalties
+- Cross-reuse penalties
+
+#### Category & Topic Engine
+- 7 categories: TRADING, MEDIA, NFT, EARLY, VC, POPULAR, INFLUENCE
+- 7 topics: trading, nft, early, vc, media, macro, security
+- Rules-based classification with confidence
+
+#### API Endpoints (20+)
+- Health, Channels, Discovery, Search, Rankings, Fraud, Metrics, Debug, Admin
 
 ## Core Requirements (Static)
 
@@ -70,41 +79,71 @@ modules/telegram-discovery/
 - No dependencies on other modules
 - Can be removed without breaking system
 
-### Scoring Formula
+### Fraud Scoring Formula
 ```
-overallScore = quality*0.25 + engagement*0.25 + growth*0.20 + consistency*0.15 - fraud*0.15
+fraudRisk = sum of:
+  - Subscriber efficiency anomaly (0.25-0.35)
+  - Entropy test (0.25)
+  - Engagement elasticity (0.30)
+  - Temporal anomaly (0.25)
+  - Dispersion anomaly (0.20)
+  - Promo network (0.25-0.40)
+  - Burst clusters (0.30)
+  - Originality penalty (0.15)
+  - Repostiness (0.18)
+  - Source concentration (0.12-0.34)
+  - Cross-reuse (0.30-0.45)
+  - High reach + low originality (0.10)
+```
+
+### Rating Formula
+```
+finalScore = 100 * base 
+  * reliability^1.3 
+  * promoPenalty 
+  * originalityBoost 
+  * feedPenalty 
+  * sourcePenalty 
+  * reusePenalty
+
+where base = 0.4*reach + 0.2*activity + 0.25*engagement - 0.15*stability
 ```
 
 ## Prioritized Backlog
 
 ### P0 (Critical - Done)
 - [x] Module structure and isolation
-- [x] MongoDB models
-- [x] Core services (discovery, metrics, ranking, fraud)
+- [x] MongoDB models (8 collections)
+- [x] Core services
+- [x] All 8 detectors
 - [x] API endpoints
-- [x] Background jobs framework
+- [x] Category/Topic engine
 
 ### P1 (High Priority - Next)
-1. [ ] Telegram API integration (MTProto)
+1. [ ] MTProto integration (real Telegram API)
 2. [ ] Real channel ingestion
 3. [ ] Post content analysis
-4. [ ] Channel validation
+4. [ ] Channel validation via Telegram
+5. [ ] Background jobs activation
 
 ### P2 (Medium Priority)
 1. [ ] NLP for content quality scoring
-2. [ ] Advanced fraud detection ML
+2. [ ] ML-enhanced fraud detection
 3. [ ] Graph analysis for influence
 4. [ ] Real-time metrics updates
+5. [ ] Webhook notifications
 
 ### P3 (Future)
 1. [ ] Admin UI integration
-2. [ ] Alerts and notifications
+2. [ ] Alert system
 3. [ ] Export/reporting
+4. [ ] Alpha detection
+5. [ ] Influence intelligence
 
-## User Personas
-1. **System** - автоматическое обнаружение и скоринг
-2. **Admin** - управление каналами, просмотр метрик
-3. **Developer** - расширение функциональности
+## Test Coverage
+- Backend: 100%
+- Integration: 100% (mock mode)
+- All 20+ endpoints tested
 
 ## Environment Variables
 ```env
@@ -112,13 +151,9 @@ MONGODB_URI=mongodb://localhost:27017/telegram_dev
 TELEGRAM_DISCOVERY_ENABLED=true
 TELEGRAM_API_ID=<optional>
 TELEGRAM_API_HASH=<optional>
-MINIMAL_BOOT=1  # Disable background jobs
+MINIMAL_BOOT=1
 ```
-
-## Notes
-- Adapter работает в mock режиме (без API credentials)
-- Jobs отключены при MINIMAL_BOOT=1
-- Все тесты пройдены успешно
 
 ---
 **Last Updated:** 2026-02-18
+**Version:** 2.0.0
