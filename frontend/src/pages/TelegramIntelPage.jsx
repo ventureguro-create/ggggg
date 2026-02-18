@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Search, RefreshCw, TrendingUp, AlertTriangle, Zap, MessageCircle } from 'lucide-react';
 import * as telegramApi from '../api/telegramIntel.api';
+import TokenMentionsTable from '../components/telegram/TokenMentionsTable';
 
 export default function TelegramIntelPage() {
   const [health, setHealth] = useState(null);
