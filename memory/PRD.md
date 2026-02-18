@@ -170,19 +170,22 @@ Daily snapshots of all channel scores for trend analysis:
 ## Prioritized Backlog
 
 ### P0 (Critical - Done ✅)
-All core features complete.
+All core backend features complete.
 
-### P1 (High Priority - Next)
-1. [ ] **Frontend UI** - leaderboard, channel pages, score charts
-2. [ ] **Top Movers Alerts** - notify on significant score changes
-3. [ ] **CoinGecko API Key** - production price layer
+### P1 (High Priority - In Progress)
+1. [x] **Token Mentions API** - public endpoint with returns data
+2. [x] **TokenMentionsTable Component** - UI for channel detail page
+3. [ ] **Network Alpha Evidence Block** - top tokens where channel was early
+4. [ ] **Compare Panel** - channel rank vs peers
+5. [ ] **Leaderboard Page** - full IntelScore rankings
 
 ### P2 (Medium Priority)
-1. [ ] Temporal Aggregation Optimization (MongoDB aggregation pipeline)
-2. [ ] Weekly/Monthly rollups for historical charts
-3. [ ] Advanced earliness (pre-mention window analysis)
+1. [ ] **Top Movers Page** - score change leaders
+2. [ ] Temporal Aggregation Optimization (MongoDB aggregation pipeline)
+3. [ ] Weekly/Monthly rollups for historical charts
+4. [ ] Advanced earliness (pre-mention window analysis)
 
 ---
 **Last Updated:** 2026-02-18
-**Version:** 4.2.0
-**Status:** Phase 1-4 Complete + Network Alpha + Temporal = Enterprise Intelligence Platform
+**Version:** 4.3.0
+**Status:** Phase 1-4 Backend Complete + Frontend UI In Progress
