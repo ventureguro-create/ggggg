@@ -106,7 +106,11 @@ export class TelegramRuntime {
   }
 
   isConnected(): boolean {
-    return this.started && !!this.client;
+    return this.started && !this.mockMode;
+  }
+
+  isMockMode(): boolean {
+    return this.mockMode;
   }
 
   getClient() {
@@ -115,6 +119,9 @@ export class TelegramRuntime {
   }
 
   async resolve(username: string) {
+    if (this.mockMode) {
+      throw new Error('Cannot resolve in MOCK mode - provide TG credentials');
+    }
     if (!this.started) throw new Error('Runtime not connected');
     
     const clean = normalizeUsername(username);
