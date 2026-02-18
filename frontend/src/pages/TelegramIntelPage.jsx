@@ -97,6 +97,32 @@ export default function TelegramIntelPage() {
     }
   };
 
+  const loadNetworkEvidence = async (username) => {
+    setEvidenceLoading(true);
+    try {
+      const data = await telegramApi.getChannelNetworkEvidence(username, 25);
+      setNetworkEvidence(data);
+    } catch (err) {
+      console.error('Failed to load network evidence:', err);
+      setNetworkEvidence(null);
+    } finally {
+      setEvidenceLoading(false);
+    }
+  };
+
+  const loadCompareData = async (username) => {
+    setCompareLoading(true);
+    try {
+      const data = await telegramApi.getChannelCompare(username);
+      setCompareData(data);
+    } catch (err) {
+      console.error('Failed to load compare data:', err);
+      setCompareData(null);
+    } finally {
+      setCompareLoading(false);
+    }
+  };
+
   const handleIngest = async () => {
     if (!activeChannel) return;
     setActionLoading(true);
