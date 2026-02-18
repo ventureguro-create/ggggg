@@ -1,4 +1,4 @@
-# Telegram Intelligence Platform - PRD v4.2
+# Telegram Intelligence Platform - PRD v4.3
 
 ## Original Problem Statement
 Создать production-ready изолированный Telegram Intelligence модуль с многофазной архитектурой:
@@ -6,6 +6,7 @@
 - **Phase 2:** Windowed analytics pipeline (7d/30d/90d) ✅
 - **Phase 3:** Alpha & Credibility Engine (Complete ✅)
 - **Phase 4:** Explainability + Governance + NetworkAlpha + Temporal ✅
+- **Phase 5:** Frontend Intelligence Dashboard (In Progress)
 
 ## Architecture
 
@@ -17,17 +18,18 @@ modules/telegram-intel/
 ├── price/                      # Phase 3 Step 2
 ├── alpha/                      # Phase 3 v2
 │   ├── track_record.service.ts
-│   └── alpha_scoring_v2.service.ts
+│   ├── alpha_scoring_v2.service.ts
+│   └── mentions.service.ts     # Enhanced with getChannelMentionsWithReturns
 ├── credibility/                # Phase 3 Step 4
 │   ├── decay.ts
 │   ├── stats.ts
 │   └── credibility.service.ts
 ├── ranking/                    # Phase 3 Step 5 + 4.2
 │   └── intel_ranking.service.ts  # Now with NetworkAlpha!
-├── network-alpha/              # NEW: Cross-channel earliness
+├── network-alpha/              # Cross-channel earliness
 │   ├── network_alpha.config.ts
 │   └── network_alpha.service.ts
-├── temporal/                   # NEW: Score evolution
+├── temporal/                   # Score evolution
 │   ├── temporal_snapshot.service.ts
 │   └── temporal_trend.service.ts
 ├── governance/                 # Phase 4
@@ -36,14 +38,32 @@ modules/telegram-intel/
 ├── explain/                    # Phase 4
 │   └── explain.service.ts
 ├── routes/
-│   ├── network_alpha.routes.ts  # NEW
-│   ├── temporal.routes.ts       # NEW
+│   ├── alpha.routes.ts         # +public mentions endpoint
+│   ├── network_alpha.routes.ts
+│   ├── temporal.routes.ts
 │   └── ... (all previous)
 └── models/
-    ├── tg.network_alpha_channel.model.ts  # NEW
-    ├── tg.network_alpha_token.model.ts    # NEW
-    ├── tg.score_snapshot.model.ts         # NEW
+    ├── tg.network_alpha_channel.model.ts
+    ├── tg.network_alpha_token.model.ts
+    ├── tg.score_snapshot.model.ts
+    ├── tg.token_mention.model.ts
     └── ... (all previous)
+```
+
+### Frontend Components
+```
+frontend/src/
+├── pages/
+│   └── TelegramIntelPage.jsx   # Main dashboard
+├── components/telegram/
+│   ├── ChannelHeader.jsx
+│   ├── FiltersBar.jsx
+│   ├── LeaderboardTable.jsx
+│   ├── ScoreChart.jsx
+│   ├── StatsBar.jsx
+│   └── TokenMentionsTable.jsx  # NEW: Token mentions with returns
+└── api/
+    └── telegramIntel.api.js    # API client
 ```
 
 ## What's Been Implemented
