@@ -16,6 +16,7 @@ const TgIntelRankingSchema = new Schema(
       baseScore: Number,
       alphaScore: Number,
       credibilityScore: Number,
+      networkAlphaScore: Number,
       fraudRisk: Number,
       reach: Number,
       engagement: Number,
@@ -25,6 +26,7 @@ const TgIntelRankingSchema = new Schema(
       fraudPenalty: Number,
       lowCredPenalty: Number,
       lowSamplePenalty: Number,
+      lowNetAlphaPenalty: Number,
     },
 
     explain: Schema.Types.Mixed,
