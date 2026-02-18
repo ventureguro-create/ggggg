@@ -128,6 +128,38 @@ Daily snapshots of all channel scores for trend analysis:
 - `GET /api/telegram-intel/temporal/:username?days=90` - score history
 - `GET /api/telegram-intel/temporal/top-movers?days=7&metric=intelScore`
 
+### Channel Token Mentions (NEW - Public)
+- `GET /api/telegram-intel/channel/:username/mentions` - token mentions with returns
+  - Query params: `days` (default: 90), `limit` (default: 100), `evaluated` (boolean)
+  - Returns: mentions list with returns data, top tokens summary, hit rate, avg return
+
+## Frontend Components (Phase 5)
+
+### Implemented ✅
+1. **TelegramIntelPage** - Main dashboard with:
+   - Stats cards (Token Mentions, Unique Tokens, Top Channels, Module Status)
+   - Channel search functionality
+   - Channel actions (Ingest, Scan Tokens, Pipeline)
+   - Token Mentions Table integration
+
+2. **TokenMentionsTable** - Display channel token mentions with:
+   - Summary stats (total, evaluated, avg 7d return, hit rate)
+   - Top tokens badges with performance
+   - Sortable table (by token, date, returns)
+   - Filter by token
+   - Return badges with visual indicators
+
+### In Progress
+3. **Channel Detail Page** - Block 3.1-3.4:
+   - ScoreChart with toggleable lines
+   - Metric blocks (Alpha, Network Alpha, Fraud)
+   - Explain block
+   - Token mentions evidence
+
+### Upcoming
+4. **Leaderboard** - IntelScore rankings with filters
+5. **Top Movers Page** - Score change leaders
+
 ## Testing
 
 ### Test Results
