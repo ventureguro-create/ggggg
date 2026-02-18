@@ -253,8 +253,12 @@ class NetworkAlphaAPITester:
                 expected_status=[200, 404]  # 404 acceptable if no data
             )
             
-            if success and data:
-                print(f"   📊 {channel} has temporal data available")
+            if success and data and isinstance(data, dict) and data.get('ok'):
+                print(f"   📊 {channel} has temporal data available: {data.get('count', 0)} snapshots")
+            elif success and data and isinstance(data, dict) and data.get('error') == 'no_data':
+                print(f"   ℹ️  {channel} has no temporal data (expected for some channels)")
+            else:
+                print(f"   ⚠️  {channel} - unexpected response")
 
     def test_admin_endpoints(self):
         """Test admin endpoints"""
