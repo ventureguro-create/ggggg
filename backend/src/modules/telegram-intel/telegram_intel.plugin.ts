@@ -172,6 +172,7 @@ export const telegramIntelPlugin: FastifyPluginAsync = async (fastify) => {
   // ==================== Alpha Engine Routes ====================
   
   await fastify.register((await import('./routes/alpha.routes.js')).alphaRoutes);
+  await fastify.register((await import('./routes/alpha_price.routes.js')).alphaPriceRoutes);
 
   // ==================== Shutdown ====================
 
