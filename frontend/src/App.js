@@ -162,6 +162,9 @@ const TwitterFeedPage = lazy(() => import("./pages/TwitterSentimentPage"));
 // S5 - Twitter AI (Sentiment × Price)
 const TwitterAIPage = lazy(() => import("./pages/TwitterAIPage"));
 
+// Telegram Intelligence Module
+const TelegramIntelPage = lazy(() => import("./pages/TelegramIntelPage"));
+
 // Connections - Influence Scoring
 const ConnectionsPage = lazy(() => import("./pages/ConnectionsPage"));
 const ConnectionsDetailPage = lazy(() => import("./pages/ConnectionsDetailPage"));
