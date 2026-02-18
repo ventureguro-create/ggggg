@@ -66,6 +66,7 @@ export const alphaRoutes: FastifyPluginAsync = async (fastify) => {
     for (const u of usernames.slice(0, 20)) {
       const username = String(u)
         .replace(/^@/, '')
+        .replace(/^https?:\/\/t\.me\//i, '')
         .toLowerCase()
         .trim();
 
