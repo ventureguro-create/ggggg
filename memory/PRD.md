@@ -128,10 +128,19 @@ Daily snapshots of all channel scores for trend analysis:
 - `GET /api/telegram-intel/temporal/:username?days=90` - score history
 - `GET /api/telegram-intel/temporal/top-movers?days=7&metric=intelScore`
 
-### Channel Token Mentions (NEW - Public)
+### Channel Token Mentions (Public)
 - `GET /api/telegram-intel/channel/:username/mentions` - token mentions with returns
   - Query params: `days` (default: 90), `limit` (default: 100), `evaluated` (boolean)
   - Returns: mentions list with returns data, top tokens summary, hit rate, avg return
+
+### Network Evidence (Block UI-4)
+- `GET /api/telegram-intel/channel/:username/network-evidence` - tokens where channel was early
+  - Query params: `limit` (default: 25)
+  - Returns: items[] with earlyRank, cohortSize, delayHours, percentile, return7d, isHit
+
+### Compare Panel (Block UI-5)
+- `GET /api/telegram-intel/channel/:username/compare` - position in network
+  - Returns: position (rank, total, percentile), gaps (up, down, toTierS), neighbors, peerContext
 
 ## Frontend Components (Phase 5)
 
