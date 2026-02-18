@@ -192,6 +192,11 @@ export const telegramIntelPlugin: FastifyPluginAsync = async (fastify) => {
   await fastify.register((await import('./routes/governance.routes.js')).governanceRoutes);
   await fastify.register((await import('./routes/explain.routes.js')).explainRoutes);
 
+  // ==================== Network Alpha + Temporal ====================
+  
+  await fastify.register((await import('./routes/network_alpha.routes.js')).networkAlphaRoutes);
+  await fastify.register((await import('./routes/temporal.routes.js')).temporalRoutes);
+
   // ==================== Shutdown ====================
 
   fastify.addHook('onClose', async () => {
