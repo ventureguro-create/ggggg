@@ -67,6 +67,23 @@ export default function TelegramIntelPage() {
     }
   };
 
+  const loadTokenMentions = async (username) => {
+    setMentionsLoading(true);
+    try {
+      const data = await telegramApi.getChannelTokenMentions(username, { 
+        days: 90, 
+        limit: 100,
+        evaluated: false 
+      });
+      setTokenMentions(data);
+    } catch (err) {
+      console.error('Failed to load token mentions:', err);
+      setTokenMentions(null);
+    } finally {
+      setMentionsLoading(false);
+    }
+  };
+
   const handleIngest = async () => {
     if (!activeChannel) return;
     setActionLoading(true);
