@@ -1,52 +1,46 @@
 /**
- * TG Rankings Model
+ * TG Ranking Model (EXTENDED)
  * Collection: tg_rankings
- * 
- * Итоговые рейтинги каналов (daily snapshots)
  */
 import { Schema, model, Document } from 'mongoose';
 
 export interface ITgRanking extends Document {
   channelId: string;
-  date: Date;                  // Daily bucket (YYYY-MM-DD)
+  username: string;
+  date: Date;
   
   // Position
-  rank: number;                // Overall rank
-  previousRank?: number;       // Previous day rank
-  rankChange: number;          // Positive = moved up
+  rank: number;
+  previousRank?: number;
+  rankChange: number;
   
-  // Scores (0-100)
+  // Scores
   overallScore: number;
+  fraudRisk: number;
+  trustLevel: 'A' | 'B' | 'C' | 'D';
   
   // Component scores
-  qualityScore: number;        // Content quality
-  engagementScore: number;     // Engagement metrics
-  growthScore: number;         // Subscriber growth
-  consistencyScore: number;    // Posting consistency
-  fraudScore: number;          // Fraud/bot detection (lower is better)
+  reachScore: number;
+  activityScore: number;
+  engagementScore: number;
+  consistencyScore: number;
+  qualityScore: number;
   
-  // Weights used
-  weights: {
-    quality: number;
-    engagement: number;
-    growth: number;
-    consistency: number;
-    fraud: number;
-  };
-  
-  // Metadata
+  // Channel snapshot
   channelSnapshot: {
     username: string;
     title: string;
-    subscriberCount: number;
+    subscriberCount?: number;
     category?: string;
   };
   
+  computedAt: Date;
   createdAt: Date;
 }
 
 const TgRankingSchema = new Schema<ITgRanking>({
-  channelId: { type: String, required: true, index: true },
+  channelId: { type: String, index: true },
+  username: { type: String, required: true, index: true },
   date: { type: Date, required: true, index: true },
   
   rank: { type: Number, required: true },
@@ -54,20 +48,18 @@ const TgRankingSchema = new Schema<ITgRanking>({
   rankChange: { type: Number, default: 0 },
   
   overallScore: { type: Number, required: true },
-  
-  qualityScore: { type: Number, default: 0 },
-  engagementScore: { type: Number, default: 0 },
-  growthScore: { type: Number, default: 0 },
-  consistencyScore: { type: Number, default: 0 },
-  fraudScore: { type: Number, default: 0 },
-  
-  weights: {
-    quality: { type: Number, default: 0.25 },
-    engagement: { type: Number, default: 0.25 },
-    growth: { type: Number, default: 0.2 },
-    consistency: { type: Number, default: 0.15 },
-    fraud: { type: Number, default: 0.15 },
+  fraudRisk: { type: Number, default: 0 },
+  trustLevel: { 
+    type: String, 
+    enum: ['A', 'B', 'C', 'D'], 
+    default: 'B' 
   },
+  
+  reachScore: { type: Number, default: 0 },
+  activityScore: { type: Number, default: 0 },
+  engagementScore: { type: Number, default: 0 },
+  consistencyScore: { type: Number, default: 0 },
+  qualityScore: { type: Number, default: 0 },
   
   channelSnapshot: {
     username: String,
@@ -75,13 +67,14 @@ const TgRankingSchema = new Schema<ITgRanking>({
     subscriberCount: Number,
     category: String,
   },
+  
+  computedAt: { type: Date, default: Date.now },
 }, {
   timestamps: { createdAt: true, updatedAt: false },
   collection: 'tg_rankings'
 });
 
-// Compound unique index
-TgRankingSchema.index({ channelId: 1, date: 1 }, { unique: true });
+TgRankingSchema.index({ username: 1, date: 1 }, { unique: true });
 TgRankingSchema.index({ date: 1, rank: 1 });
 TgRankingSchema.index({ date: 1, overallScore: -1 });
 

@@ -1,47 +1,49 @@
 /**
- * TG Post Model
+ * TG Post Model (EXTENDED)
  * Collection: tg_posts
- * 
- * Хранит посты из Telegram каналов
  */
 import { Schema, model, Document } from 'mongoose';
 
 export interface ITgPost extends Document {
-  postId: string;              // Telegram message ID
-  channelId: string;           // Reference to channel
-  channelUsername: string;     // @username for quick access
+  postId: string;
+  channelId: string;
+  channelUsername: string;
+  messageId: number;
   
   // Content
   text?: string;
   mediaType?: 'photo' | 'video' | 'document' | 'poll' | 'none';
   hasForward: boolean;
-  forwardFrom?: string;        // Forwarded from channel
+  forwardedFrom?: {
+    id?: string;
+    username?: string;
+    title?: string;
+  } | null;
   
-  // Metrics at ingestion time
+  // Metrics
   views: number;
   forwards?: number;
-  reactions?: number;
-  comments?: number;
+  replies?: number;
+  reactionsCount?: number;
+  
+  // Extracted data
+  mentions?: string[];
+  fingerprint?: string;  // For cross-reuse detection
   
   // Timestamps
+  date: Date;
   postedAt: Date;
   ingestedAt: Date;
   
-  // Analysis
-  sentiment?: 'positive' | 'negative' | 'neutral';
-  topics?: string[];
-  mentionedTokens?: string[];  // $BTC, $ETH etc
-  mentionedChannels?: string[]; // @channel mentions
-  
-  // Metadata
   createdAt: Date;
   updatedAt: Date;
 }
 
 const TgPostSchema = new Schema<ITgPost>({
   postId: { type: String, required: true },
-  channelId: { type: String, required: true, index: true },
+  channelId: { type: String, index: true },
   channelUsername: { type: String, required: true, index: true },
+  messageId: { type: Number, required: true },
   
   text: String,
   mediaType: {
@@ -50,31 +52,31 @@ const TgPostSchema = new Schema<ITgPost>({
     default: 'none'
   },
   hasForward: { type: Boolean, default: false },
-  forwardFrom: String,
+  forwardedFrom: {
+    id: String,
+    username: String,
+    title: String,
+  },
   
   views: { type: Number, default: 0 },
   forwards: Number,
-  reactions: Number,
-  comments: Number,
+  replies: Number,
+  reactionsCount: Number,
   
-  postedAt: { type: Date, required: true, index: true },
+  mentions: [String],
+  fingerprint: { type: String, index: true },
+  
+  date: { type: Date, required: true, index: true },
+  postedAt: { type: Date, required: true },
   ingestedAt: { type: Date, default: Date.now },
-  
-  sentiment: {
-    type: String,
-    enum: ['positive', 'negative', 'neutral']
-  },
-  topics: [String],
-  mentionedTokens: [String],
-  mentionedChannels: [String],
 }, {
   timestamps: true,
   collection: 'tg_posts'
 });
 
-// Compound unique index
-TgPostSchema.index({ channelId: 1, postId: 1 }, { unique: true });
+// Indexes
+TgPostSchema.index({ channelUsername: 1, messageId: 1 }, { unique: true });
 TgPostSchema.index({ postedAt: -1 });
-TgPostSchema.index({ mentionedTokens: 1 });
+TgPostSchema.index({ fingerprint: 1, date: 1 });
 
 export const TgPostModel = model<ITgPost>('TgPost', TgPostSchema);
