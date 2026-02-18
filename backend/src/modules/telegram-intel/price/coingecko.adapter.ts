@@ -12,6 +12,17 @@ const BASE = 'https://api.coingecko.com/api/v3';
 const REQUEST_INTERVAL = 2000; // 2 seconds between requests (safe margin)
 const MAX_RETRIES = 3;
 
+// Optional API key for CoinGecko Pro/Demo tier
+const API_KEY = process.env.COINGECKO_API_KEY || '';
+
+function getHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (API_KEY) {
+    headers['x-cg-demo-api-key'] = API_KEY;
+  }
+  return headers;
+}
+
 let lastCall = 0;
 let coinListCache: Array<{ id: string; symbol: string; name: string }> | null = null;
 let coinListCacheTime = 0;
