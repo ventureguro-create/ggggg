@@ -72,6 +72,11 @@ export class TelegramRuntime {
     }
 
     this.opts.log('[TG] Credentials loaded from secure storage');
+    this.opts.log('[TG] Session info', { 
+      length: session.length, 
+      firstChar: session[0],
+      preview: session.substring(0, 30) 
+    });
     
     // Use StringSession directly - NO interactive auth
     this.session = new StringSession(session);
