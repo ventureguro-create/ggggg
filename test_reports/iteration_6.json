@@ -1,0 +1,81 @@
+{
+  "summary": "Alpha Engine Price Layer (Phase 3 Step 2) testing completed. 15/17 tests passed, 2 skipped (CoinGecko API timeout). All 6 API endpoints return correct structure. Rate limiting implemented. MongoDB cache model defined. CoinGecko adapter encountering 401 errors on some calls causing timeouts.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "CoinGecko Adapter",
+        "issue": "CoinGecko API returning 401 (Unauthorized) errors causing request timeouts. Direct curl to CoinGecko works but adapter requests fail. Possible causes: (1) CoinGecko now requires API key for some endpoints, (2) IP rate limiting from previous requests, (3) Missing headers",
+        "priority": "HIGH",
+        "fix_suggestion": "Add CoinGecko API key support (optional env var COINGECKO_API_KEY) with x-cg-demo-api-key header. Also add 401 to non-retry errors like 404."
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "coingecko.adapter.ts",
+        "issue": "401 errors cause retry loop (up to 3 retries with backoff) before returning null. Should treat 401 like 404 (no retry)",
+        "priority": "MEDIUM"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "GET /api/admin/telegram-intel/alpha/price-cache-stats - returns totalCached, uniqueTokens, oldestEntry",
+    "GET /api/admin/telegram-intel/alpha/evaluation-stats - returns total, evaluated, pending, withPriceData, avgReturn24h, avgReturn7d",
+    "GET /api/admin/telegram-intel/alpha/price/UNKNOWNTOKEN123 - returns ok=false for unknown tokens",
+    "GET /api/admin/telegram-intel/alpha/price/:token/history - requires date parameter",
+    "GET /api/admin/telegram-intel/alpha/price/:token/history - validates date format",
+    "GET /api/admin/telegram-intel/alpha/price/ETH/history?date=2025-01-01 - returns structure with ok, token, date, priceUSD",
+    "POST /api/admin/telegram-intel/alpha/evaluate - returns ok, processed, evaluated, skipped, errors",
+    "POST /api/admin/telegram-intel/alpha/evaluate - respects limit parameter (max 200)",
+    "POST /api/admin/telegram-intel/alpha/evaluate - works with empty JSON body",
+    "POST /api/admin/telegram-intel/alpha/reevaluate - returns ok, updated",
+    "POST /api/admin/telegram-intel/alpha/reevaluate - respects limit parameter (max 100)",
+    "POST /api/admin/telegram-intel/alpha/reevaluate - works with empty JSON body",
+    "Rate limiting - multiple rapid requests don't crash service",
+    "Error handling - empty date returns error",
+    "Error handling - invalid date 'null' returns invalid_date error"
+  ],
+  "skipped_tests": [
+    "GET /api/admin/telegram-intel/alpha/price/ETH - SKIPPED due to CoinGecko API timeout (401 errors)",
+    "GET /api/admin/telegram-intel/alpha/price/eth - SKIPPED (token normalization test, CoinGecko timeout)"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_alpha_price_layer.py",
+    "/app/test_reports/pytest/pytest_alpha_price_results.xml"
+  ],
+  "action_items": [
+    "CRITICAL: Fix CoinGecko 401 error handling - add 401 to non-retry errors in fetchWithRetry() to prevent timeout loops",
+    "Add optional CoinGecko API key support via COINGECKO_API_KEY env var and x-cg-demo-api-key header",
+    "Consider adding fallback price provider for better reliability"
+  ],
+  "critical_code_review_comments": [
+    "coingecko.adapter.ts: 401 Unauthorized errors should not trigger retry loop - add to non-retry conditions alongside 404",
+    "coingecko.adapter.ts: Missing API key header support for CoinGecko pro/demo tier",
+    "price.service.ts: Good implementation of caching and symbol resolution",
+    "price_evaluation.service.ts: Well-structured batch processing with proper error handling"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_alpha_price_layer.py"
+  ],
+  "success_rate": {
+    "backend": "88% (15/17 passed, 2 skipped due to external API timeout)",
+    "frontend": "N/A - backend only testing"
+  },
+  "seed_data_creation": "None - tests use existing data structures",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Price Layer routes working. CoinGecko API returns 401 errors causing timeout - main agent should fix error handling. All local logic (cache stats, evaluation stats, endpoints structure) working correctly. Test file at /app/backend/tests/test_alpha_price_layer.py can be reused after CoinGecko fix.",
+  "rca_of_the_issue": {
+    "problem": "CoinGecko API calls return 401 Unauthorized causing request timeouts",
+    "root_cause": "1. CoinGecko free tier may now require API key for some endpoints. 2. The adapter retries on 401 errors (3 retries with backoff) instead of failing fast",
+    "evidence": "[CoinGecko] Request failed: Request failed with status code 401 in logs",
+    "mitigation_steps": [
+      "Add 401 to non-retry status codes in fetchWithRetry() - line 32-55",
+      "Add optional API key support: const apiKey = process.env.COINGECKO_API_KEY; then add header {headers: {'x-cg-demo-api-key': apiKey}} if apiKey is set"
+    ]
+  }
+}
