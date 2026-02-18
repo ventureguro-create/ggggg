@@ -139,6 +139,7 @@ export class CoinGeckoAdapter {
     const data = await fetchWithRetry(async () => {
       const res = await axios.get(`${BASE}/coins/${coinId}/history`, {
         params: { date: dateStr, localization: false },
+        headers: getHeaders(),
       });
       return res.data;
     });
