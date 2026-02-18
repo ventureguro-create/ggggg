@@ -133,6 +133,109 @@ export class TokenMentionsService {
   }
 
   /**
+   * Get channel mentions with returns data for frontend display
+   * Used by Channel Detail Page - Token Mentions Table
+   */
+  async getChannelMentionsWithReturns(
+    username: string,
+    opts: { days?: number; limit?: number; evaluated?: boolean } = {}
+  ) {
+    const { days = 90, limit = 100, evaluated = false } = opts;
+    const since = new Date(Date.now() - days * 86400000);
+    const normalizedUsername = username.toLowerCase();
+
+    // Build query
+    const query: any = {
+      username: normalizedUsername,
+      mentionedAt: { $gte: since },
+    };
+
+    // Optionally filter only evaluated mentions (with returns data)
+    if (evaluated) {
+      query.evaluated = true;
+    }
+
+    const mentions = await TgTokenMentionModel.find(query)
+      .sort({ mentionedAt: -1 })
+      .limit(Math.min(500, Math.max(1, limit)))
+      .select('-_id -__v')
+      .lean();
+
+    // Compute summary stats
+    const tokenStats = new Map<string, { 
+      count: number; 
+      totalReturn7d: number; 
+      totalMax7d: number;
+      evaluatedCount: number;
+    }>();
+
+    for (const m of mentions) {
+      const stats = tokenStats.get(m.token) || { 
+        count: 0, 
+        totalReturn7d: 0, 
+        totalMax7d: 0,
+        evaluatedCount: 0 
+      };
+      
+      stats.count += 1;
+      
+      if (m.evaluated && m.returns) {
+        stats.evaluatedCount += 1;
+        stats.totalReturn7d += m.returns.r7d || 0;
+        stats.totalMax7d += m.returns.max7d || 0;
+      }
+      
+      tokenStats.set(m.token, stats);
+    }
+
+    // Build top tokens summary
+    const topTokens = [...tokenStats.entries()]
+      .map(([token, stats]) => ({
+        token,
+        mentionCount: stats.count,
+        evaluatedCount: stats.evaluatedCount,
+        avgReturn7d: stats.evaluatedCount > 0 
+          ? Number((stats.totalReturn7d / stats.evaluatedCount).toFixed(2)) 
+          : null,
+        avgMax7d: stats.evaluatedCount > 0 
+          ? Number((stats.totalMax7d / stats.evaluatedCount).toFixed(2)) 
+          : null,
+      }))
+      .sort((a, b) => b.mentionCount - a.mentionCount)
+      .slice(0, 30);
+
+    // Calculate overall stats
+    const evaluatedMentions = mentions.filter(m => m.evaluated);
+    const totalEvaluated = evaluatedMentions.length;
+    const avgReturn7d = totalEvaluated > 0
+      ? evaluatedMentions.reduce((sum, m) => sum + (m.returns?.r7d || 0), 0) / totalEvaluated
+      : null;
+    const hitRate = totalEvaluated > 0
+      ? evaluatedMentions.filter(m => (m.returns?.r7d || 0) > 0).length / totalEvaluated
+      : null;
+
+    return {
+      ok: true,
+      username: normalizedUsername,
+      days,
+      total: mentions.length,
+      evaluated: totalEvaluated,
+      avgReturn7d: avgReturn7d !== null ? Number(avgReturn7d.toFixed(2)) : null,
+      hitRate: hitRate !== null ? Number(hitRate.toFixed(3)) : null,
+      topTokens,
+      mentions: mentions.map(m => ({
+        token: m.token,
+        mentionedAt: m.mentionedAt,
+        messageId: m.messageId,
+        context: m.context,
+        evaluated: m.evaluated,
+        priceAtMention: m.priceAtMention,
+        returns: m.returns,
+      })),
+    };
+  }
+
+  /**
    * Get aggregate stats across all channels
    */
   async getStats(days = 30) {
