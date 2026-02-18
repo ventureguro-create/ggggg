@@ -128,11 +128,15 @@ class TelegramDiscoveryTester:
             self.test_channel_id = seed_response['channelId']
             print(f"   Created channel ID: {self.test_channel_id}")
             
+            # Extract username from channelId (remove 'seed_' prefix)
+            test_username = seed_data["username"]
+            print(f"   Using username: {test_username}")
+            
             # Test getting single channel details
             success, channel_detail, _ = self.run_test(
                 "Get Single Channel Details", 
                 "GET", 
-                f"api/telegram/channels/{self.test_channel_id}"
+                f"api/telegram/channels/{test_username}"
             )
             
             # Test updating channel status
@@ -140,9 +144,16 @@ class TelegramDiscoveryTester:
             success, update_response, _ = self.run_test(
                 "Update Channel Status", 
                 "PATCH", 
-                f"api/telegram/channels/{self.test_channel_id}/status",
+                f"api/telegram/channels/{test_username}/status",
                 200,
                 status_update
+            )
+            
+            # Test debug endpoint
+            success, debug_response, _ = self.run_test(
+                "Get Channel Debug Info", 
+                "GET", 
+                f"api/telegram/channels/{test_username}/debug"
             )
         
         # Test getting non-existent channel (should return 404)
