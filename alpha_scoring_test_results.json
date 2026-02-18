@@ -1,190 +1,114 @@
 {
-  "summary": "Alpha Scoring Engine API testing completed. 0/15 tests passed.",
+  "summary": "Alpha Scoring Engine API testing completed. 15/15 tests passed.",
   "tests_run": 15,
-  "tests_passed": 0,
-  "success_rate": "0.0%",
-  "failed_tests": [
-    {
-      "name": "Calculate Alpha Score for alpha_channel",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Calculate Alpha Score for beta_channel",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Channel Score with @ prefix normalization",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Channel Score missing username",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Channel Score for non-existent channel",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Batch Calculate Alpha Scores (default params)",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Batch Calculate with custom params",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Get Alpha Score Leaderboard (default)",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Get Leaderboard with limit=5",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Get alpha_channel details",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Get channel details with @ prefix",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Get non-existent channel details",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Get Alpha Scoring Statistics",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Empty username string",
-      "error": null,
-      "status_code": 520
-    },
-    {
-      "name": "Whitespace-only username",
-      "error": null,
-      "status_code": 520
-    }
-  ],
+  "tests_passed": 15,
+  "success_rate": "100.0%",
+  "failed_tests": [],
   "all_results": [
     {
       "name": "Calculate Alpha Score for alpha_channel",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:03.765202",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:45.821871",
+      "response_sample": "{'ok': True, 'metrics': {'successRate': 0.75, 'avgReturn7d': 13.25, 'avgReturn30d': 22.5, 'earlynessFactor': 0.2500263967335391, 'consistency': 0.972078021534059, 'hitRate': 1, 'alphaScore': 54.1, 'to..."
     },
     {
       "name": "Calculate Alpha Score for beta_channel",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:03.895251",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:45.958975",
+      "response_sample": "{'ok': True, 'metrics': {'successRate': 0, 'avgReturn7d': -16, 'avgReturn30d': -17.666666666666668, 'earlynessFactor': 0.25187826568930044, 'consistency': 0.9563990634657159, 'hitRate': 0, 'alphaScore..."
     },
     {
       "name": "Channel Score with @ prefix normalization",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:04.056092",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:46.107075",
+      "response_sample": "{'ok': True, 'metrics': {'successRate': 0.75, 'avgReturn7d': 13.25, 'avgReturn30d': 22.5, 'earlynessFactor': 0.2500264318415638, 'consistency': 0.972078021534059, 'hitRate': 1, 'alphaScore': 54.1, 'to..."
     },
     {
       "name": "Channel Score missing username",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:04.252484",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:11:46.235593",
+      "response_sample": "{'ok': False, 'error': 'username_required'}"
     },
     {
       "name": "Channel Score for non-existent channel",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:04.393446",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:46.374744",
+      "response_sample": "{'ok': False, 'metrics': None, 'error': 'insufficient_data: 0/3 evaluated mentions'}"
     },
     {
       "name": "Batch Calculate Alpha Scores (default params)",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:04.580912",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:46.514738",
+      "response_sample": "{'ok': True, 'processed': 2, 'calculated': 2, 'skipped': 0}"
     },
     {
       "name": "Batch Calculate with custom params",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:04.744000",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:46.642491",
+      "response_sample": "{'ok': True, 'processed': 2, 'calculated': 2, 'skipped': 0}"
     },
     {
       "name": "Get Alpha Score Leaderboard (default)",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:04.882211",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:46.773737",
+      "response_sample": "{'ok': True, 'channels': [{'username': 'alpha_channel', 'alphaScore': 59.3, 'successRate': 66.7, 'avgReturn7d': 12.7, 'consistency': 0.97, 'totalMentions': 3, 'lastCalculated': '2026-02-18T13:11:46.61..."
     },
     {
       "name": "Get Leaderboard with limit=5",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:05.039268",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:46.935625",
+      "response_sample": "{'ok': True, 'channels': [{'username': 'alpha_channel', 'alphaScore': 59.3, 'successRate': 66.7, 'avgReturn7d': 12.7, 'consistency': 0.97, 'totalMentions': 3, 'lastCalculated': '2026-02-18T13:11:46.61..."
     },
     {
       "name": "Get alpha_channel details",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:05.316922",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:47.213070",
+      "response_sample": "{'ok': True, 'alpha': {'username': 'alpha_channel', 'alphaScore': 54.1, 'avgReturn30d': 22.5, 'avgReturn7d': 13.25, 'bestMention': {'token': 'AVAX', 'mentionedAt': '2026-02-03T13:08:20.540Z', 'return7..."
     },
     {
       "name": "Get channel details with @ prefix",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:05.514467",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:47.336081",
+      "response_sample": "{'ok': True, 'alpha': {'username': 'alpha_channel', 'alphaScore': 54.1, 'avgReturn30d': 22.5, 'avgReturn7d': 13.25, 'bestMention': {'token': 'AVAX', 'mentionedAt': '2026-02-03T13:08:20.540Z', 'return7..."
     },
     {
       "name": "Get non-existent channel details",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:05.652669",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:11:47.482028",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
     },
     {
       "name": "Get Alpha Scoring Statistics",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:05.863695",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:11:47.613481",
+      "response_sample": "{'totalChannels': 2, 'avgAlphaScore': 41.8, 'topScore': 54.1, 'avgSuccessRate': 37.5}"
     },
     {
       "name": "Empty username string",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:06.173064",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:11:47.873544",
+      "response_sample": "{'ok': False, 'error': 'username_required'}"
     },
     {
       "name": "Whitespace-only username",
-      "success": false,
-      "status_code": 520,
-      "timestamp": "2026-02-18T13:10:06.339468",
-      "response_sample": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 8]>    <html class=\"no-..."
+      "success": true,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:11:48.027405",
+      "response_sample": "{'ok': False, 'error': 'username_required'}"
     }
   ]
 }
