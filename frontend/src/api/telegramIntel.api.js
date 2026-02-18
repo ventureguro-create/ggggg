@@ -97,6 +97,31 @@ export async function getChannelTokenMentions(username, opts = {}) {
   return response.data;
 }
 
+// ==================== Network Evidence (Block UI-4) ====================
+
+/**
+ * Get channel's network alpha evidence - tokens where channel was early
+ * @param {string} username - Channel username
+ * @param {number} limit - Max number of tokens to return
+ */
+export async function getChannelNetworkEvidence(username, limit = 25) {
+  const response = await api.get(`${API_PUBLIC}/channel/${username}/network-evidence`, {
+    params: { limit },
+  });
+  return response.data;
+}
+
+// ==================== Compare Panel (Block UI-5) ====================
+
+/**
+ * Get channel's position comparison in the network
+ * @param {string} username - Channel username
+ */
+export async function getChannelCompare(username) {
+  const response = await api.get(`${API_PUBLIC}/channel/${username}/compare`);
+  return response.data;
+}
+
 // ==================== Alpha v2 ====================
 
 export async function getAlphaLeaderboard(limit = 20) {
