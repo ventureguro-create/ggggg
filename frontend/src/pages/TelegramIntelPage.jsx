@@ -364,12 +364,25 @@ export default function TelegramIntelPage() {
             )}
           </div>
 
+          {/* Compare Panel - Channel Position */}
+          <ComparePanel 
+            data={compareData}
+            loading={compareLoading}
+          />
+
           {/* Token Mentions Table with Returns */}
           <TokenMentionsTable 
             data={tokenMentions}
             loading={mentionsLoading}
             showSummary={true}
             maxRows={50}
+          />
+
+          {/* Network Alpha Evidence */}
+          <NetworkEvidenceTable 
+            data={networkEvidence}
+            loading={evidenceLoading}
+            maxRows={25}
           />
         </div>
       )}
