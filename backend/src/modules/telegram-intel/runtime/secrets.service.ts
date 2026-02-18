@@ -108,23 +108,43 @@ export function getTelegramSecrets(): TelegramSecrets | null {
   
   // Try encrypted secrets first
   if (secrets.TELEGRAM_API_ID && secrets.TELEGRAM_API_HASH && secrets.TELEGRAM_SESSION) {
+    // Convert base64url to standard base64 if needed (telethon uses base64url, gramjs uses standard)
+    let session = secrets.TELEGRAM_SESSION;
+    if (session.includes('-') || session.includes('_')) {
+      session = session.replace(/-/g, '+').replace(/_/g, '/');
+      // Add padding if needed
+      const padding = 4 - (session.length % 4);
+      if (padding !== 4 && padding !== 0) {
+        session += '='.repeat(padding);
+      }
+    }
+    
     return {
       apiId: parseInt(secrets.TELEGRAM_API_ID, 10),
       apiHash: secrets.TELEGRAM_API_HASH,
-      session: secrets.TELEGRAM_SESSION,
+      session,
     };
   }
 
   // Fallback to env vars (for development without secrets.enc)
   const apiId = process.env.TG_API_ID;
   const apiHash = process.env.TG_API_HASH;
-  const session = process.env.TG_STRING_SESSION;
+  let session = process.env.TG_STRING_SESSION;
 
   if (apiId && apiHash && session) {
+    // Same base64url conversion for env var
+    if (session.includes('-') || session.includes('_')) {
+      session = session.replace(/-/g, '+').replace(/_/g, '/');
+      const padding = 4 - (session.length % 4);
+      if (padding !== 4 && padding !== 0) {
+        session += '='.repeat(padding);
+      }
+    }
+    
     return {
       apiId: parseInt(apiId, 10),
       apiHash: apiHash,
-      session: session,
+      session,
     };
   }
 
