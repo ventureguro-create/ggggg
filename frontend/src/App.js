@@ -412,6 +412,9 @@ function App() {
               {/* S5 - Twitter AI (Sentiment × Price) */}
               <Route path="/sentiment/twitter-ai" element={<TwitterAIPage />} />
               
+              {/* Telegram Intelligence Module */}
+              <Route path="/telegram" element={<TelegramIntelPage />} />
+              
               {/* S3.8.2 - Sentiment Admin Dashboard (in Platform Admin) */}
               <Route path="/admin/ml/sentiment" element={<AdminSentimentPage />} />
               
