@@ -1,15 +1,11 @@
-# Telegram Discovery Module - PRD v2.0
+# Telegram Intelligence Platform - PRD v3.0
 
 ## Original Problem Statement
-Создать production-ready изолированный Telegram Discovery + Ranking модуль с:
-- MTProto runtime (mock для разработки)
-- Discovery (seed → expand)
-- Ingestion (посты + профиль)
-- Advanced Metrics layer
-- Fraud detection (статистически осмысленный)
-- Fair Rating engine
-- Category/Topic classification
-- API endpoints
+Создать production-ready изолированный Telegram Intelligence модуль с многофазной архитектурой:
+- **Phase 1:** Production-hardened MTProto runtime
+- **Phase 2:** Windowed analytics pipeline (7d/30d/90d)
+- **Phase 3 (Future):** Alpha & Credibility Engine
+- **Phase 4 (Future):** Taxonomy, Governance, Explainability
 
 ## Architecture
 
@@ -22,138 +18,180 @@
 
 ### Module Structure
 ```
-modules/telegram-discovery/
-├── models/          # 8 MongoDB коллекций (tg_*)
-├── services/        # discovery, metrics, ranking, fraud (advanced)
-├── detectors/       # 8 детекторов
-├── categories/      # category engine + topic vectors
-├── adapter/         # Telegram API wrapper (mock mode)
-├── jobs/            # Background jobs
-├── routes/          # API endpoints
-└── utils/           # Math, extract helpers
+modules/telegram-intel/
+├── telegram_intel.plugin.ts   # Main plugin with routes
+├── runtime/
+│   ├── telegram.runtime.ts    # MTProto client
+│   ├── secrets.service.ts     # Secure credentials
+│   ├── rate_limiter.ts        # RPS control
+│   ├── retry.ts               # Exponential backoff
+│   └── entity_cache.ts        # LRU cache
+├── ingestion/
+│   ├── ingestion.service.ts   # Channel ingestion
+│   └── fingerprint.ts         # Content hashing
+├── jobs/
+│   ├── ingestion.job.ts       # Batch ingestion
+│   ├── metrics_pipeline.job.ts # Analytics pipeline
+│   └── job_lock.service.ts    # Concurrency control
+├── metrics/
+│   └── window_metrics.service.ts
+├── fraud/
+│   └── fraud_snapshot.service.ts
+├── ranking/
+│   └── ranking_snapshot.service.ts
+└── models/
+    ├── tg.channel_state.model.ts
+    ├── tg.metrics_window.model.ts
+    ├── tg.fraud_signal.model.ts
+    └── tg.job_lock.model.ts
 ```
 
 ## What's Been Implemented
 
-### Date: 2026-02-18 (Extended)
+### Date: 2026-02-18
 
-#### Advanced Detectors (100% Complete)
-- [x] **Promo Detector** - promo density, links block ratio
-- [x] **Burst Detector** - peak clusters, view spikes
-- [x] **Elasticity Detector** - forwards vs views curve
-- [x] **Originality Detector** - copy-paste detection
-- [x] **Forward Composition** - aggregator/repost-feed detection
-- [x] **Language Detector** - RU/UA/EN classification
-- [x] **Source Diversity** - HHI, dominant source, spillover detection
-- [x] **Cross-Reuse Detector** - synchronized network content
+#### Phase 1: Production Hardening ✅
+- [x] **Secure Secrets Management**
+  - Fernet encryption for credentials (secrets.enc)
+  - TG_SECRETS_KEY env variable
+  - Pyrogram → GramJS session conversion
+  - No plaintext credentials in code/git
+  
+- [x] **StringSession-only Mode**
+  - No interactive authorization
+  - Session loaded from encrypted file
+  - Automatic base64url conversion
+  
+- [x] **MTProto Runtime**
+  - Rate limiting (global + per-method RPS)
+  - Exponential backoff with retry
+  - FLOOD_WAIT handling
+  - Entity cache (LRU, 800 items)
+  - Safe shutdown
 
-#### Advanced Fraud Service
-- Multi-signal fraud detection
-- 12+ fraud indicators
-- Entropy analysis
-- Engagement elasticity
-- Temporal anomalies
-- Network spillover patterns
+#### Phase 2: Analytics Pipeline ✅
+- [x] **Cursor-based Incremental Ingestion**
+  - lastMessageId tracking per channel
+  - Cooldown protection (1 hour default)
+  - Profile refresh (12 hours default)
+  - Batch limit (150 messages)
+  
+- [x] **Window-based Metrics (7d/30d/90d)**
+  - postsCount, postsPerDay
+  - medianViews, p90Views
+  - viewDispersion, viewGrowthSlope
+  - forwardRate, replyRate
+  - activeDaysRatio
+  
+- [x] **Fraud Signal Snapshots**
+  - subscriberEfficiency
+  - irregularPosting
+  - spikeRatio
+  - elasticity
+  - Combined fraudRisk score
+  
+- [x] **Ranking Snapshots**
+  - Computed score
+  - Trust level assignment
 
-#### Advanced Rating Service
-- Bayesian smoothing
-- Stability penalties
-- Reliability weighting
-- Promo/originality/feed penalties
-- Source diversity penalties
-- Cross-reuse penalties
+## API Endpoints
 
-#### Category & Topic Engine
-- 7 categories: TRADING, MEDIA, NFT, EARLY, VC, POPULAR, INFLUENCE
-- 7 topics: trading, nft, early, vc, media, macro, security
-- Rules-based classification with confidence
+### Admin Endpoints (telegram-intel)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/admin/telegram-intel/health` | GET | Health check with runtime status |
+| `/api/admin/telegram-intel/ingestion/run` | POST | Batch ingestion |
+| `/api/admin/telegram-intel/ingestion/channel` | POST | Single channel ingestion |
+| `/api/admin/telegram-intel/pipeline/run` | POST | Run full metrics pipeline |
+| `/api/admin/telegram-intel/pipeline/channel` | POST | Pipeline for single channel |
+| `/api/admin/telegram-intel/state/:username` | GET | Get channel state (cursor) |
+| `/api/admin/telegram-intel/metrics/:username` | GET | Get window metrics |
+| `/api/admin/telegram-intel/fraud/:username` | GET | Get fraud signals |
 
-#### API Endpoints (20+)
-- Health, Channels, Discovery, Search, Rankings, Fraud, Metrics, Debug, Admin
+## Database Collections
 
-## Core Requirements (Static)
+### telegram-intel module
+- **tg_channel_states** - Ingestion cursors and profile state
+- **tg_metrics_windows** - 7d/30d/90d metric snapshots
+- **tg_fraud_signals** - Fraud risk assessments
+- **tg_rankings** - Computed channel scores
+- **tg_job_locks** - Job concurrency control
 
-### Module Isolation
-- All collections prefixed with `tg_`
-- All routes under `/api/telegram/*`
-- No dependencies on other modules
-- Can be removed without breaking system
+### telegram-discovery module (legacy)
+- **tg_channels** - Channel profiles
+- **tg_posts** - Raw post data
+- **tg_seeds** - Seed channels
+- **tg_metrics** - Basic metrics
 
-### Fraud Scoring Formula
+## Environment Variables
+
+```env
+# Required for telegram-intel
+TG_SECRETS_KEY=<fernet-key>           # Decryption key for secrets.enc
+TELEGRAM_INTEL_ENABLED=true           # Enable module
+
+# Optional tuning
+TG_RPS_GLOBAL=2                       # Global rate limit
+TG_RPS_RESOLVE=1                      # Resolve rate limit
+TG_RPS_HISTORY=2                      # History rate limit
+TG_MAX_RETRIES=6                      # Max retry attempts
+TG_RETRY_BASE_MS=750                  # Base retry delay
+TG_PROFILE_REFRESH_HOURS=12           # Profile refresh interval
+TG_INGEST_COOLDOWN_MIN=60             # Cooldown between ingests
+TG_INGEST_BATCH_LIMIT=150             # Max messages per batch
 ```
-fraudRisk = sum of:
-  - Subscriber efficiency anomaly (0.25-0.35)
-  - Entropy test (0.25)
-  - Engagement elasticity (0.30)
-  - Temporal anomaly (0.25)
-  - Dispersion anomaly (0.20)
-  - Promo network (0.25-0.40)
-  - Burst clusters (0.30)
-  - Originality penalty (0.15)
-  - Repostiness (0.18)
-  - Source concentration (0.12-0.34)
-  - Cross-reuse (0.30-0.45)
-  - High reach + low originality (0.10)
-```
 
-### Rating Formula
-```
-finalScore = 100 * base 
-  * reliability^1.3 
-  * promoPenalty 
-  * originalityBoost 
-  * feedPenalty 
-  * sourcePenalty 
-  * reusePenalty
+## Security
 
-where base = 0.4*reach + 0.2*activity + 0.25*engagement - 0.15*stability
-```
+### Credentials Storage
+1. **secrets.enc** - Fernet-encrypted JSON file
+2. **TG_SECRETS_KEY** - Decryption key in env variable
+3. **No plaintext** in code, logs, or git
+4. **.gitignore** protects `.secrets/` directory
+
+### Session Format
+- Pyrogram StringSession auto-converted to GramJS format
+- DC-to-IP mapping for Telegram production servers
+- Session held in memory only
+
+## Testing
+
+### Test Results (iteration_4.json)
+- **Success Rate:** 100% (22/22 tests passed)
+- **Test Channel:** @durov (472 posts ingested)
+- **Fraud Score:** 0.15
+- **Ranking Score:** 29.35
 
 ## Prioritized Backlog
 
-### P0 (Critical - Done)
-- [x] Module structure and isolation
-- [x] MongoDB models (8 collections)
-- [x] Core services
-- [x] All 8 detectors
-- [x] API endpoints
-- [x] Category/Topic engine
+### P0 (Critical - Done ✅)
+- [x] Secure secrets management
+- [x] StringSession-only runtime
+- [x] Cursor-based ingestion
+- [x] Window metrics (7d/30d/90d)
+- [x] Fraud signals
+- [x] Basic ranking
 
 ### P1 (High Priority - Next)
-1. [ ] MTProto integration (real Telegram API)
-2. [ ] Real channel ingestion
-3. [ ] Post content analysis
-4. [ ] Channel validation via Telegram
-5. [ ] Background jobs activation
+1. [ ] **Phase 3: Alpha Engine**
+   - Token mention extraction ($TOKEN)
+   - Price feed integration (CoinGecko)
+   - Alpha score calculation
+   - Channel track record
 
 ### P2 (Medium Priority)
-1. [ ] NLP for content quality scoring
-2. [ ] ML-enhanced fraud detection
-3. [ ] Graph analysis for influence
-4. [ ] Real-time metrics updates
-5. [ ] Webhook notifications
+1. [ ] Taxonomy Layer (categories, topics, languages)
+2. [ ] Explainability Layer (score breakdown API)
+3. [ ] Governance Layer (admin UI for overrides)
+4. [ ] Cross-channel reuse detection
 
 ### P3 (Future)
-1. [ ] Admin UI integration
-2. [ ] Alert system
-3. [ ] Export/reporting
-4. [ ] Alpha detection
-5. [ ] Influence intelligence
-
-## Test Coverage
-- Backend: 100%
-- Integration: 100% (mock mode)
-- All 20+ endpoints tested
-
-## Environment Variables
-```env
-MONGODB_URI=mongodb://localhost:27017/telegram_dev
-TELEGRAM_DISCOVERY_ENABLED=true
-TELEGRAM_API_ID=<optional>
-TELEGRAM_API_HASH=<optional>
-MINIMAL_BOOT=1
-```
+1. [ ] ML-enhanced fraud detection
+2. [ ] Graph analysis for influence
+3. [ ] Real-time metrics updates
+4. [ ] Webhook notifications
 
 ---
 **Last Updated:** 2026-02-18
-**Version:** 2.0.0
+**Version:** 3.0.0
+**Status:** Phase 1-2 Complete, Production Ready
