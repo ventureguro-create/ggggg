@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "tests_run": 6,
+    "tests_passed": 6,
+    "success_rate": "100.0%"
+  },
+  "all_results": [
+    {
+      "name": "Get Network Alpha Top with Tier A",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:48:49.551276",
+      "response_sample": "{'ok': True, 'count': 2, 'items': [{'username': 'alpha_channel', 'computedAt': '2026-02-18T13:48:15.087Z', 'createdAt': '2026-02-18T13:44:41.190Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookba..."
+    },
+    {
+      "name": "Get Intel Score Top Channels",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:48:49.696947",
+      "response_sample": "{'ok': True, 'count': 3, 'items': [{'username': 'alpha_channel', 'components': {'baseScore': 0, 'alphaScore': 23.85997185638152, 'credibilityScore': 54.67454595554133, 'networkAlphaScore': 87.45907519..."
+    },
+    {
+      "name": "Get Top Movers (7 days)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:48:49.830776",
+      "response_sample": "{'ok': True, 'metric': 'intelScore', 'days': 7, 'count': 3, 'items': [{'username': 'alpha_channel', 'metric': 'intelScore', 'from': {'day': '2026-02-18', 'value': 70}, 'to': {'day': '2026-02-18', 'val..."
+    },
+    {
+      "name": "Get alpha_channel Network Alpha",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:48:49.967055",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'computedAt': '2026-02-18T13:48:15.087Z', 'createdAt': '2026-02-18T13:44:41.190Z', 'explain': {'qualifiedTokens': 2, 'config': {'lookbackDays': 90, 's..."
+    },
+    {
+      "name": "Get alpha_channel Intel Score",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:48:50.105309",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'components': {'baseScore': 0, 'alphaScore': 23.85997185638152, 'credibilityScore': 54.67454595554133, 'networkAlphaScore': 87.4590751916839, 'fraudRi..."
+    },
+    {
+      "name": "Compute Network Alpha with Custom Lookback",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:48:50.278531",
+      "response_sample": "{'ok': True, 'lookbackDays': 60, 'qualifiedTokens': 2, 'channels': 5}"
+    }
+  ],
+  "timestamp": "2026-02-18T13:48:50.279441"
+}
