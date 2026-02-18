@@ -136,7 +136,7 @@ export const telegramIntelPlugin: FastifyPluginAsync = async (fastify) => {
       version: '1.0.0',
       runtime: {
         connected: rt.isConnected(),
-        mode: rt.isConnected() ? 'live' : 'mock',
+        mode: rt.isMockMode() ? 'mock' : 'live',
       },
     };
   });
