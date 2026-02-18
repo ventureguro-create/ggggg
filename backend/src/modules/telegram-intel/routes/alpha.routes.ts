@@ -51,6 +51,24 @@ export const alphaRoutes: FastifyPluginAsync = async (fastify) => {
     return svc.getStats(days);
   });
 
+  // ==================== PUBLIC ENDPOINTS ====================
+
+  // Public: Get channel token mentions with returns (for Channel Detail Page)
+  fastify.get('/api/telegram-intel/channel/:username/mentions', async (req) => {
+    const { username } = req.params as any;
+    const q = (req.query as any) || {};
+    const days = Number(q.days || 90);
+    const limit = Number(q.limit || 100);
+    const evaluated = q.evaluated === 'true' || q.evaluated === '1';
+
+    const normalizedUsername = String(username)
+      .replace(/^@/, '')
+      .toLowerCase()
+      .trim();
+
+    return svc.getChannelMentionsWithReturns(normalizedUsername, { days, limit, evaluated });
+  });
+
   // Batch scan multiple channels
   fastify.post('/api/admin/telegram-intel/alpha/scan/batch', async (req) => {
     const body = (req.body as any) || {};
