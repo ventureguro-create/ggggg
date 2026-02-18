@@ -180,20 +180,25 @@ Daily snapshots of all channel scores for trend analysis:
 ### P0 (Critical - Done ✅)
 All core backend features complete.
 
-### P1 (High Priority - In Progress)
+### P1 (High Priority - Complete ✅)
 1. [x] **Token Mentions API** - public endpoint with returns data
 2. [x] **TokenMentionsTable Component** - UI for channel detail page
-3. [ ] **Network Alpha Evidence Block** - top tokens where channel was early
-4. [ ] **Compare Panel** - channel rank vs peers
-5. [ ] **Leaderboard Page** - full IntelScore rankings
+3. [x] **Network Alpha Evidence API** - GET /channel/:username/network-evidence
+4. [x] **NetworkEvidenceTable Component** - shows where channel was early
+5. [x] **Compare API** - GET /channel/:username/compare
+6. [x] **ComparePanel Component** - position in network
+
+### P1 (High Priority - Next)
+1. [ ] **Leaderboard Page** (Block UI-1) - full IntelScore rankings with filters
+2. [ ] **Dedicated Channel Page** (Block UI-2) - /telegram/[username] route
 
 ### P2 (Medium Priority)
-1. [ ] **Top Movers Page** - score change leaders
+1. [ ] **Movers Page** (Block UI-6) - top movers by score change
 2. [ ] Temporal Aggregation Optimization (MongoDB aggregation pipeline)
 3. [ ] Weekly/Monthly rollups for historical charts
 4. [ ] Advanced earliness (pre-mention window analysis)
 
 ---
 **Last Updated:** 2026-02-18
-**Version:** 4.3.0
-**Status:** Phase 1-4 Backend Complete + Frontend UI In Progress
+**Version:** 4.4.0
+**Status:** Phase 1-4 Backend Complete + Frontend UI Blocks 3-5 Complete
