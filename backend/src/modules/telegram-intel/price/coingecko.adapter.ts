@@ -91,7 +91,7 @@ export class CoinGeckoAdapter {
     if (!coinListCache || Date.now() - coinListCacheTime > COIN_LIST_CACHE_TTL) {
       await rateLimit();
       const data = await fetchWithRetry(async () => {
-        const res = await axios.get(`${BASE}/coins/list`);
+        const res = await axios.get(`${BASE}/coins/list`, { headers: getHeaders() });
         return res.data;
       });
       
