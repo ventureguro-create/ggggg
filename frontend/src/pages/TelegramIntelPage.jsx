@@ -64,13 +64,20 @@ export default function TelegramIntelPage() {
 
       setChannelData({ state, metrics, fraud, mentions });
       
-      // Load detailed token mentions with returns
-      loadTokenMentions(username);
+      // Load all channel detail data in parallel
+      loadChannelDetailData(username);
     } catch (err) {
       setError('Failed to load channel data');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const loadChannelDetailData = async (username) => {
+    // Load all detail panels in parallel
+    loadTokenMentions(username);
+    loadNetworkEvidence(username);
+    loadCompareData(username);
   };
 
   const loadTokenMentions = async (username) => {
