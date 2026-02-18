@@ -199,19 +199,19 @@ class TelegramDiscoveryTester:
         """Test fraud detection APIs"""
         print("🛡️ Testing Fraud Detection API...")
         
-        # We need a channel ID for fraud analysis
-        if hasattr(self, 'test_channel_id') and self.test_channel_id:
+        # We need a channel username for fraud analysis
+        if hasattr(self, 'test_username') and self.test_username:
             success, fraud_data, _ = self.run_test(
-                "Analyze Channel for Fraud", 
+                "Analyze Test Channel for Fraud", 
                 "GET", 
-                f"api/telegram/fraud/analyze/{self.test_channel_id}"
+                f"api/telegram/fraud/analyze/{self.test_username}"
             )
         else:
-            # Try with a seed channel (assuming they exist)
+            # Try with an existing seed channel
             success, fraud_data, _ = self.run_test(
-                "Analyze Channel for Fraud (seed channel)", 
+                "Analyze Existing Channel for Fraud", 
                 "GET", 
-                "api/telegram/fraud/analyze/seed_crypto_news"
+                "api/telegram/fraud/analyze/durov"
             )
 
     def test_additional_endpoints(self):
