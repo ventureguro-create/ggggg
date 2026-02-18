@@ -200,11 +200,11 @@ class NetworkAlphaAPITester:
         test_channels = ["alpha_channel", "gamma_channel", "durov"]
         
         for channel in test_channels:
-            # Test getting IntelScore (this endpoint may vary based on implementation)
+            # Use the correct endpoint from intel_ranking.routes.ts
             success, data, _ = self.run_test(
                 f"Get IntelScore for {channel}", 
                 "GET", 
-                f"api/telegram-intel/ranking/{channel}",
+                f"api/telegram-intel/intel/{channel}",
                 expected_status=[200, 404]  # 404 is acceptable if channel doesn't exist
             )
             
@@ -217,6 +217,10 @@ class NetworkAlphaAPITester:
                 print(f"   🧠 {channel} Network Alpha Score: {components.get('networkAlphaScore', 'N/A')}")
                 print(f"   ✨ {channel} Network Alpha Effective: {explain.get('networkAlphaEffective', 'N/A')}")
                 print(f"   🚪 {channel} Cred Gate: {explain.get('credGate', 'N/A')}")
+            elif success and data and isinstance(data, dict) and data.get('ok') == False:
+                print(f"   ℹ️  {channel} not found (expected for some channels)")
+            else:
+                print(f"   ⚠️  {channel} - unexpected response structure")
 
     def test_temporal_snapshots(self):
         """Test Temporal Snapshot functionality"""
