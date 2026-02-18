@@ -39,8 +39,11 @@ async function fetchWithRetry<T>(fn: () => Promise<T>, retries = MAX_RETRIES): P
         continue;
       }
       
-      // Not found - don't retry
-      if (status === 404) {
+      // Not found or Unauthorized - don't retry
+      if (status === 404 || status === 401) {
+        if (status === 401) {
+          console.log('[CoinGecko] 401 Unauthorized - may need API key');
+        }
         return null;
       }
       
