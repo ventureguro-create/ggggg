@@ -1,0 +1,50 @@
+{
+  "summary": "Completed comprehensive backend testing of Telegram Intelligence module in LIVE mode. All 6 requested endpoints tested and working correctly. Runtime connected to real Telegram API via StringSession (MTProto). Tested health, ingestion, state, pipeline, metrics, and fraud endpoints.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "GET /api/admin/telegram-intel/health - mode: live, connected: true",
+    "POST /api/admin/telegram-intel/ingestion/channel - inserts posts or returns cooldown",
+    "GET /api/admin/telegram-intel/state/:username - returns lastMessageId cursor",
+    "POST /api/admin/telegram-intel/pipeline/channel - computes metrics, fraud, score",
+    "GET /api/admin/telegram-intel/metrics/:username - returns 7d, 30d, 90d window metrics",
+    "GET /api/admin/telegram-intel/fraud/:username - returns fraud signals breakdown",
+    "POST /api/admin/telegram-intel/ingestion/run - batch ingestion (processed 5, inserted 152)",
+    "POST /api/admin/telegram-intel/pipeline/run - batch pipeline (processed 6, errors 0)",
+    "Username normalization (@prefix, t.me/ handling)",
+    "Validation - empty/whitespace username returns 400",
+    "404 handling for non-existent channels",
+    "MongoDB _id exclusion in all responses"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_telegram_intel.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_telegram_intel.py"
+  ],
+  "success_rate": {
+    "backend": "100% (22/22 tests passed)",
+    "frontend": "N/A - backend only testing"
+  },
+  "seed_data_creation": "Using existing @durov channel data (472 posts ingested via LIVE Telegram API)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Telegram-intel module running in LIVE mode with real Telegram API via MTProto StringSession. @durov channel fully ingested (472 posts). All endpoints tested at localhost:8003. TG_SECRETS_KEY configured in backend/.env.",
+  "test_data": {
+    "test_channel": "durov",
+    "last_message_id": 472,
+    "windows_tested": ["7d", "30d", "90d"],
+    "fraud_score": 0.15,
+    "ranking_score": 29.35
+  }
+}
