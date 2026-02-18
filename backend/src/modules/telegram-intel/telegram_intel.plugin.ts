@@ -2,6 +2,8 @@
  * Telegram Intelligence Plugin
  * 
  * Production-ready Telegram data pipeline:
+ * - StringSession-only mode (secure, no interactive auth)
+ * - Secrets loaded from encrypted file
  * - MTProto runtime with rate limiting, retry, FLOOD_WAIT handling
  * - Incremental cursor-based ingestion
  * - Window-based metrics (7d/30d/90d)
@@ -13,7 +15,6 @@ import { FastifyPluginAsync } from 'fastify';
 import cron from 'node-cron';
 
 import { TelegramRuntime } from './runtime/telegram.runtime.js';
-import { FileSessionStore } from './runtime/file_session_store.js';
 import { JobLockService } from './jobs/job_lock.service.js';
 import { IngestionService } from './ingestion/ingestion.service.js';
 import { IngestionJob } from './jobs/ingestion.job.js';
@@ -25,12 +26,8 @@ import { TgFraudSignalModel } from './models/tg.fraud_signal.model.js';
 export const telegramIntelPlugin: FastifyPluginAsync = async (fastify) => {
   const log = (msg: string, meta?: any) => fastify.log.info(meta || {}, msg);
 
-  // Initialize runtime (handles mock mode if no credentials)
+  // Initialize runtime (uses secure secrets loading)
   const rt = new TelegramRuntime({
-    apiId: Number(process.env.TG_API_ID || 0),
-    apiHash: String(process.env.TG_API_HASH || ''),
-    sessionStore: new FileSessionStore(process.env.TG_SESSION_PATH || './.secrets/tg.session'),
-
     rpsGlobal: Number(process.env.TG_RPS_GLOBAL || '2'),
     rpsResolve: Number(process.env.TG_RPS_RESOLVE || '1'),
     rpsHistory: Number(process.env.TG_RPS_HISTORY || '2'),
