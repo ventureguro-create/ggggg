@@ -1,0 +1,199 @@
+{
+  "summary": {
+    "tests_run": 27,
+    "tests_passed": 27,
+    "success_rate": "100.0%"
+  },
+  "failed_tests": [],
+  "all_results": [
+    {
+      "name": "Backend Health Check",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:21.272892",
+      "response_sample": "{'ok': True, 'service': 'proxy', 'nodeBackend': 'http://localhost:8002'}"
+    },
+    {
+      "name": "Compute Alpha v2 for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:21.435854",
+      "response_sample": "{'username': 'alpha_channel', 'alphaScore': 21.32584445864494, 'breakdown': {'n': 9, 'hit7': 0.39519999999999994, 'hit24': 0.30782608695652175, 'avg7': 14.222222222222221, 'std7': 5.223404121574737, '..."
+    },
+    {
+      "name": "Compute Alpha v2 for beta_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:21.577763",
+      "response_sample": "{'username': 'beta_channel', 'alphaScore': 16.90347190993017, 'breakdown': {'n': 8, 'hit7': 0.12, 'hit24': 0.27636363636363637, 'avg7': -21.875, 'std7': 9.319837713179345, 'rar': -2.1197038759692597, ..."
+    },
+    {
+      "name": "Batch Alpha v2 Compute",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:21.729193",
+      "response_sample": "{'ok': True, 'processed': 2, 'computed': 2, 'skipped': 0}"
+    },
+    {
+      "name": "Alpha v2 Leaderboard",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:21.924470",
+      "response_sample": "{'ok': True, 'items': [{'username': 'alpha_channel', 'alphaScore': 21.32584445864494, 'breakdown': {'n': 9, 'hit7': 0.39519999999999994, 'hit24': 0.30782608695652175, 'avg7': 14.222222222222221, 'std7..."
+    },
+    {
+      "name": "Alpha v2 Compute - Missing Username",
+      "success": true,
+      "status_code": 400,
+      "timestamp": "2026-02-18T13:25:22.059040",
+      "response_sample": "{'ok': False, 'error': 'username_required'}"
+    },
+    {
+      "name": "Compute Credibility for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:22.194875",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'credibilityScore': 53.468906761389, 'tier': 'B', 'hitRatePosterior': {'a': 7.4438475652158065, 'b': 14.404465391195352, 'mean': 0.34070582841186775, ..."
+    },
+    {
+      "name": "Compute Credibility for beta_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:22.354639",
+      "response_sample": "{'ok': True, 'doc': {'username': 'beta_channel', 'credibilityScore': 31.650740333984263, 'tier': 'D', 'hitRatePosterior': {'a': 2.88, 'b': 18.27400224681585, 'mean': 0.13614444994367458, 'ciLow': 0, '..."
+    },
+    {
+      "name": "Get Credibility Details for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:22.496649",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'computedAt': '2026-02-18T13:25:22.173Z', 'createdAt': '2026-02-18T13:23:14.559Z', 'credibilityScore': 53.468906761389, 'hitRatePosterior': {'a': 7.44..."
+    },
+    {
+      "name": "Get Credibility Details for beta_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:22.678195",
+      "response_sample": "{'ok': True, 'doc': {'username': 'beta_channel', 'computedAt': '2026-02-18T13:25:22.331Z', 'createdAt': '2026-02-18T13:23:14.564Z', 'credibilityScore': 31.650740333984263, 'hitRatePosterior': {'a': 2...."
+    },
+    {
+      "name": "Get Credibility for Non-existent Channel",
+      "success": true,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:25:22.834667",
+      "response_sample": "{'ok': False, 'error': 'not_found'}"
+    },
+    {
+      "name": "Get Active Scoring Config",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:22.959308",
+      "response_sample": "{'ok': True, 'config': {'key': 'intel_v1', 'version': 1, 'weights': {'base': 0.45, 'alpha': 0.3, 'cred': 0.25}, 'fraud': {'killSwitch': 0.75, 'penaltyBase': 0.2, 'penaltyScale': 0.6}, 'lowCred': {'piv..."
+    },
+    {
+      "name": "Set BLOCKLIST Override for beta_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.099737",
+      "response_sample": "{'ok': True}"
+    },
+    {
+      "name": "Set ALLOWLIST Override for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.236470",
+      "response_sample": "{'ok': True}"
+    },
+    {
+      "name": "Set Forced Tier Override",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.443866",
+      "response_sample": "{'ok': True}"
+    },
+    {
+      "name": "Compute Intel Score for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.579024",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'intelScore': 70, 'tier': 'A', 'components': {'baseScore': 0, 'alphaScore': 21.32584445864494, 'credibilityScore': 53.468906761389, 'fraudRisk': 0, 'r..."
+    },
+    {
+      "name": "Compute Intel Score for beta_channel (BLOCKLIST test)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.712052",
+      "response_sample": "{'ok': True, 'doc': {'username': 'beta_channel', 'intelScore': 0, 'tier': 'D', 'explain': {'reason': 'BLOCKLIST', 'override': {'_id': '6995bd5d506ddfde5c76f14f', 'username': 'beta_channel', '__v': 0, ..."
+    },
+    {
+      "name": "Intel Leaderboard (Public)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.850082",
+      "response_sample": "{'ok': True, 'count': 2, 'items': [{'username': 'alpha_channel', 'components': {'baseScore': 0, 'alphaScore': 21.32584445864494, 'credibilityScore': 53.468906761389, 'fraudRisk': 0, 'reach': 0, 'engag..."
+    },
+    {
+      "name": "Get Intel Details for alpha_channel (Public)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:23.975996",
+      "response_sample": "{'ok': True, 'doc': {'username': 'alpha_channel', 'components': {'baseScore': 0, 'alphaScore': 21.32584445864494, 'credibilityScore': 53.468906761389, 'fraudRisk': 0, 'reach': 0, 'engagement': 0}, 'co..."
+    },
+    {
+      "name": "Get Intel Details for beta_channel (Public)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:24.141473",
+      "response_sample": "{'ok': True, 'doc': {'username': 'beta_channel', 'components': {'baseScore': 0, 'alphaScore': 16.90347190993017, 'credibilityScore': 31.6507185075237, 'fraudRisk': 0, 'reach': 0, 'engagement': 0}, 'co..."
+    },
+    {
+      "name": "Get Explanation for alpha_channel",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:24.305543",
+      "response_sample": "{'ok': True, 'username': 'alpha_channel', 'snapshot': {'intel': {'_id': '6995bd4c506ddfde5c76f112', 'username': 'alpha_channel', '__v': 0, 'components': {'baseScore': 0, 'alphaScore': 21.3258444586449..."
+    },
+    {
+      "name": "Get Explanation for beta_channel (BLOCKLIST)",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:24.447305",
+      "response_sample": "{'ok': True, 'username': 'beta_channel', 'snapshot': {'intel': {'_id': '6995bd4c506ddfde5c76f11b', 'username': 'beta_channel', '__v': 0, 'components': {'baseScore': 0, 'alphaScore': 16.90347190993017,..."
+    },
+    {
+      "name": "Get Explanation for Non-existent Channel",
+      "success": true,
+      "status_code": 404,
+      "timestamp": "2026-02-18T13:25:24.571928",
+      "response_sample": "{'ok': False, 'error': 'intel_not_found'}"
+    },
+    {
+      "name": "Flow Step 1: Compute Alpha for integration test",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:24.701814",
+      "response_sample": "{'username': 'integration_test_channel', 'alphaScore': 0, 'breakdown': {'n': 0, 'reason': 'low_sample'}}"
+    },
+    {
+      "name": "Flow Step 2: Compute Credibility for integration test",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:24.827617",
+      "response_sample": "{'ok': True, 'doc': {'username': 'integration_test_channel', 'credibilityScore': 26.068443557822995, 'tier': 'D', 'hitRatePosterior': {'a': 2.88, 'b': 13.120001, 'mean': 0.17999998875000067, 'ciLow': ..."
+    },
+    {
+      "name": "Flow Step 3: Compute Intel Score for integration test",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:24.959030",
+      "response_sample": "{'ok': True, 'doc': {'username': 'integration_test_channel', 'intelScore': 4.848773927492719, 'tier': 'D', 'components': {'baseScore': 0, 'alphaScore': 0, 'credibilityScore': 26.068443557822995, 'frau..."
+    },
+    {
+      "name": "Flow Step 4: Get Explanation for integration test",
+      "success": true,
+      "status_code": 200,
+      "timestamp": "2026-02-18T13:25:25.091673",
+      "response_sample": "{'ok': True, 'username': 'integration_test_channel', 'snapshot': {'intel': {'_id': '6995bdc4506ddfde5c76f1e7', 'username': 'integration_test_channel', '__v': 0, 'components': {'baseScore': 0, 'alphaSc..."
+    }
+  ]
+}
