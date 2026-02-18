@@ -1,0 +1,76 @@
+{
+  "summary": "Alpha Engine (Token Extractor + Mention Storage) testing completed. 29/30 tests passed. All 4 API endpoints working correctly. Token extraction tested for $TOKEN cashtags, #TOKEN hashtags, and PAIR/USDT formats. Idempotency working (duplicates skipped on re-scan). One bug found: batch scan endpoint doesn't normalize https://t.me/ URLs.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "POST /api/admin/telegram-intel/alpha/scan/batch",
+        "issue": "Batch scan doesn't normalize https://t.me/ URLs in usernames (only removes @ prefix). Single scan at /scan/channel normalizes both correctly.",
+        "priority": "LOW",
+        "fix_suggestion": "Add .replace(/^https?:\\/\\/t\\.me\\//i, '') to the username normalization in batch scan loop (line 67-70 in alpha.routes.ts)"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "POST /api/admin/telegram-intel/alpha/scan/channel - basic scan returns ok, postsScanned, mentionsCreated",
+    "POST /api/admin/telegram-intel/alpha/scan/channel - requires username (400 on empty)",
+    "POST /api/admin/telegram-intel/alpha/scan/channel - normalizes @prefix",
+    "POST /api/admin/telegram-intel/alpha/scan/channel - normalizes https://t.me/ URLs",
+    "POST /api/admin/telegram-intel/alpha/scan/channel - accepts custom days param",
+    "POST /api/admin/telegram-intel/alpha/scan/channel - accepts minConfidence param",
+    "GET /api/admin/telegram-intel/alpha/mentions/:username - returns structure with topTokens, mentions",
+    "GET /api/admin/telegram-intel/alpha/mentions/:username - normalizes @prefix",
+    "GET /api/admin/telegram-intel/alpha/mentions/:username - accepts days, limit params",
+    "GET /api/admin/telegram-intel/alpha/mentions/:username - returns empty for non-existent channel",
+    "GET /api/admin/telegram-intel/alpha/stats - returns totalMentions, uniqueTokensCount, topTokens, topChannels",
+    "GET /api/admin/telegram-intel/alpha/stats - accepts days param",
+    "POST /api/admin/telegram-intel/alpha/scan/batch - processes multiple channels",
+    "POST /api/admin/telegram-intel/alpha/scan/batch - requires usernames array",
+    "POST /api/admin/telegram-intel/alpha/scan/batch - limits to 20 channels max",
+    "Idempotency: re-scan skips duplicates (7 created first scan, 7 skipped second scan)",
+    "Token extraction: $TOKEN cashtag with confidence ~0.82",
+    "Token extraction: #TOKEN hashtag with confidence ~0.64",
+    "Token extraction: PAIR/USDT format with confidence ~0.58+",
+    "Token extraction: context boost for keywords like 'airdrop', 'listing' (+0.06 each)",
+    "MongoDB _id excluded from all responses"
+  ],
+  "failed_tests": [
+    "POST /api/admin/telegram-intel/alpha/scan/batch - does NOT normalize https://t.me/ URLs"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_alpha_token_mentions.py",
+    "/app/test_reports/pytest/pytest_alpha_results.xml"
+  ],
+  "action_items": [
+    "Fix batch scan URL normalization: add .replace(/^https?:\\/\\/t\\.me\\//i, '') in alpha.routes.ts line 67-70"
+  ],
+  "critical_code_review_comments": [
+    "Inconsistent URL normalization between single scan (line 15-19) and batch scan (line 67-70) - batch missing t.me regex"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_alpha_token_mentions.py"
+  ],
+  "success_rate": {
+    "backend": "97% (29/30 tests passed)",
+    "frontend": "N/A - backend only testing"
+  },
+  "seed_data_creation": "Created test_crypto channel with 5 posts containing $ARB, #SOL, $ETH, ARB/USDT, PEPE/USDT, $MAGIC. Cleaned up after testing.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Alpha Engine Phase 3 Step 1 fully tested. Token extraction logic in token_extractor.ts working correctly for cashtags ($TOKEN), hashtags (#TOKEN), and exchange pairs (PAIR/USDT). Minor bug in batch scan URL normalization. Test channel @durov has no crypto content (0 mentions). Use test data with crypto tokens to verify extraction.",
+  "test_data": {
+    "token_extraction_examples": {
+      "$ARB": { "source": "cashtag", "confidence": 0.82 },
+      "#SOL": { "source": "hashtag", "confidence": 0.64 },
+      "ARB/USDT": { "source": "plain", "confidence": 0.58 },
+      "$MAGIC + airdrop context": { "source": "cashtag", "confidence": 0.88 }
+    },
+    "idempotency_verified": true,
+    "min_confidence_default": 0.35
+  }
+}
