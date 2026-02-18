@@ -169,6 +169,10 @@ export const telegramIntelPlugin: FastifyPluginAsync = async (fastify) => {
     log('[telegram-intel] MINIMAL_BOOT=1, cron jobs disabled');
   }
 
+  // ==================== Alpha Engine Routes ====================
+  
+  await fastify.register((await import('./routes/alpha.routes.js')).alphaRoutes);
+
   // ==================== Shutdown ====================
 
   fastify.addHook('onClose', async () => {
