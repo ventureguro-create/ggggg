@@ -140,25 +140,33 @@ Daily snapshots of all channel scores for trend analysis:
    - Stats cards (Token Mentions, Unique Tokens, Top Channels, Module Status)
    - Channel search functionality
    - Channel actions (Ingest, Scan Tokens, Pipeline)
-   - Token Mentions Table integration
+   - Integration of all detail panels
 
-2. **TokenMentionsTable** - Display channel token mentions with:
+2. **TokenMentionsTable** (Block UI-3) ✅ - Display channel token mentions with:
    - Summary stats (total, evaluated, avg 7d return, hit rate)
    - Top tokens badges with performance
    - Sortable table (by token, date, returns)
    - Filter by token
    - Return badges with visual indicators
 
-### In Progress
-3. **Channel Detail Page** - Block 3.1-3.4:
-   - ScoreChart with toggleable lines
-   - Metric blocks (Alpha, Network Alpha, Fraud)
-   - Explain block
-   - Token mentions evidence
+3. **NetworkEvidenceTable** (Block UI-4) ✅ - Network Alpha Evidence:
+   - Shows tokens where channel was an early source
+   - Early Rank, Delay, Percentile, 7d ROI, Cohort size
+   - First place highlighting with award icon
+   - Summary: totalTokens, firstPlaces, avgPercentile
+   - Sorting by percentile, return, rank
+
+4. **ComparePanel** (Block UI-5) ✅ - Position in Network:
+   - Global rank and percentile
+   - Distance to Tier S
+   - Gap to higher/lower rank
+   - Nearby channels (prev/next)
+   - Tier context (peers count, tier average, vs average)
 
 ### Upcoming
-4. **Leaderboard** - IntelScore rankings with filters
-5. **Top Movers Page** - Score change leaders
+5. **Leaderboard Page** (Block UI-1) - IntelScore rankings with filters, sparklines
+6. **Channel Detail Page** (Block UI-2) - Dedicated route with ScoreChart
+7. **Movers Page** (Block UI-6) - Top movers by score change
 
 ## Testing
 
