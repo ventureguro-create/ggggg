@@ -175,6 +175,23 @@ export const telegramIntelPlugin: FastifyPluginAsync = async (fastify) => {
   await fastify.register((await import('./routes/alpha_price.routes.js')).alphaPriceRoutes);
   await fastify.register((await import('./routes/alpha_scoring.routes.js')).alphaScoringRoutes);
 
+  // ==================== Phase 3 v2: Institutional Alpha ====================
+  
+  await fastify.register((await import('./routes/alpha_scoring_v2.routes.js')).alphaScoringV2Routes);
+
+  // ==================== Phase 3 Step 4: Credibility ====================
+  
+  await fastify.register((await import('./routes/credibility.routes.js')).credibilityRoutes);
+
+  // ==================== Phase 3 Step 5: Intel Ranking ====================
+  
+  await fastify.register((await import('./routes/intel_ranking.routes.js')).intelRankingRoutes);
+
+  // ==================== Phase 4: Governance + Explain ====================
+  
+  await fastify.register((await import('./routes/governance.routes.js')).governanceRoutes);
+  await fastify.register((await import('./routes/explain.routes.js')).explainRoutes);
+
   // ==================== Shutdown ====================
 
   fastify.addHook('onClose', async () => {
