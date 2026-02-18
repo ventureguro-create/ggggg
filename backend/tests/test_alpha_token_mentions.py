@@ -350,6 +350,101 @@ class TestIdempotency:
         print("✓ Re-scan handled duplicates correctly (no errors)")
 
 
+class TestTokenExtractionWithRealData:
+    """Test token extraction using test_crypto channel with crypto content"""
+
+    def test_cashtag_extraction(self):
+        """$TOKEN cashtags should be extracted with high confidence"""
+        # Scan test_crypto channel (has posts with $ARB, $ETH, $MAGIC)
+        requests.post(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/scan/channel",
+            json={"username": "test_crypto", "days": 30}
+        )
+
+        response = requests.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/test_crypto"
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        # Find cashtag mentions
+        cashtag_mentions = [m for m in data.get("mentions", []) if m.get("context", {}).get("source") == "cashtag"]
+        
+        assert len(cashtag_mentions) > 0, "Should extract cashtag tokens"
+        
+        # Check ARB with high confidence
+        arb_cashtag = next((m for m in cashtag_mentions if m["token"] == "ARB"), None)
+        assert arb_cashtag is not None, "Should extract $ARB cashtag"
+        assert arb_cashtag["context"]["confidence"] >= 0.80, "Cashtag confidence should be >= 0.80"
+        print(f"✓ Cashtag extraction: ARB with confidence {arb_cashtag['context']['confidence']}")
+
+    def test_hashtag_extraction(self):
+        """#TOKEN hashtags should be extracted"""
+        response = requests.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/test_crypto"
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        hashtag_mentions = [m for m in data.get("mentions", []) if m.get("context", {}).get("source") == "hashtag"]
+        
+        assert len(hashtag_mentions) > 0, "Should extract hashtag tokens"
+        
+        sol_hashtag = next((m for m in hashtag_mentions if m["token"] == "SOL"), None)
+        assert sol_hashtag is not None, "Should extract #SOL hashtag"
+        assert sol_hashtag["context"]["confidence"] >= 0.60, "Hashtag confidence should be >= 0.60"
+        print(f"✓ Hashtag extraction: SOL with confidence {sol_hashtag['context']['confidence']}")
+
+    def test_pair_extraction(self):
+        """PAIR/USDT patterns should be extracted"""
+        response = requests.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/test_crypto"
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        # Find plain source mentions (pairs)
+        plain_mentions = [m for m in data.get("mentions", []) if m.get("context", {}).get("source") == "plain"]
+        
+        # Should have ARB from ARB/USDT and PEPE from PEPE/USDT
+        plain_tokens = {m["token"] for m in plain_mentions}
+        assert "ARB" in plain_tokens or "PEPE" in plain_tokens, "Should extract pair tokens"
+        print(f"✓ Pair extraction: found tokens {plain_tokens}")
+
+    def test_context_boost_working(self):
+        """Context keywords should boost confidence"""
+        response = requests.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/test_crypto"
+        )
+        data = response.json()
+
+        # MAGIC should have boosted confidence due to "airdrop" context
+        magic_mention = next((m for m in data.get("mentions", []) if m["token"] == "MAGIC"), None)
+        assert magic_mention is not None, "Should have MAGIC mention"
+        assert magic_mention["context"]["confidence"] > 0.82, "Context boost should increase confidence above base"
+        print(f"✓ Context boost: MAGIC confidence {magic_mention['context']['confidence']}")
+
+    def test_mention_has_required_fields(self):
+        """Each mention should have all required fields"""
+        response = requests.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/test_crypto"
+        )
+        data = response.json()
+
+        required_fields = ["token", "postId", "messageId", "mentionedAt", "username", "context", "evaluated"]
+        context_fields = ["snippet", "source", "confidence"]
+
+        for mention in data.get("mentions", []):
+            for field in required_fields:
+                assert field in mention, f"Missing field: {field}"
+            
+            context = mention.get("context", {})
+            for field in context_fields:
+                assert field in context, f"Missing context field: {field}"
+
+        print("✓ All mentions have required fields")
+
+
 class TestDataValidation:
     """Test response data validation and _id exclusion"""
 
@@ -358,11 +453,11 @@ class TestDataValidation:
         # First ensure we have some data by scanning
         requests.post(
             f"{BASE_URL}/api/admin/telegram-intel/alpha/scan/channel",
-            json={"username": TEST_CHANNEL, "days": 30}
+            json={"username": "test_crypto", "days": 30}
         )
 
         response = requests.get(
-            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/{TEST_CHANNEL}"
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/mentions/test_crypto"
         )
         assert response.status_code == 200
         data = response.json()
