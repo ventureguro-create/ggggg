@@ -2,6 +2,8 @@
  * Telegram Runtime - Production Hardened
  * 
  * Features:
+ * - StringSession-only mode (no interactive auth)
+ * - Secure secrets loading from encrypted file
  * - Rate limiting (global + per-method)
  * - Retry/backoff with exponential delay
  * - FLOOD_WAIT handling (auto-pause)
@@ -15,7 +17,7 @@ import { Api } from 'telegram';
 import { RateLimiter } from './rate_limiter.js';
 import { withRetry } from './retry.js';
 import { EntityCache } from './entity_cache.js';
-import { TgSessionStore } from './file_session_store.js';
+import { getTelegramSecrets } from './secrets.service.js';
 
 export function normalizeUsername(x: string): string {
   const s = (x || '').trim();
@@ -25,10 +27,6 @@ export function normalizeUsername(x: string): string {
 }
 
 type RuntimeOpts = {
-  apiId: number;
-  apiHash: string;
-  sessionStore: TgSessionStore;
-
   rpsGlobal: number;
   rpsResolve: number;
   rpsHistory: number;
@@ -43,6 +41,7 @@ export class TelegramRuntime {
   private client!: TelegramClient;
   private session!: StringSession;
   private started = false;
+  private mockMode = false;
 
   private limiter: RateLimiter;
   private entityCache = new EntityCache<any>(800, 6 * 60 * 60 * 1000);
@@ -54,36 +53,49 @@ export class TelegramRuntime {
   async start() {
     if (this.started) return;
 
-    const saved = await this.opts.sessionStore.load();
-    this.session = new StringSession(saved ?? '');
-
-    this.client = new TelegramClient(this.session, this.opts.apiId, this.opts.apiHash, {
-      connectionRetries: 5,
-    });
-
-    // For development/CI: skip interactive auth if no API credentials
-    if (!this.opts.apiId || !this.opts.apiHash) {
-      this.opts.log('[TG] No API credentials, running in mock mode');
+    // Load secrets from encrypted file or env vars
+    const secrets = getTelegramSecrets();
+    
+    if (!secrets) {
+      this.opts.log('[TG] No credentials found, running in MOCK mode');
+      this.opts.log('[TG] Set TG_SECRETS_KEY env var and provide secrets.enc file');
+      this.mockMode = true;
       return;
     }
 
-    try {
-      // Use dynamic import for input to handle environments without TTY
-      const input = await import('input');
-      
-      await this.client.start({
-        phoneNumber: async () => await input.default.text('Telegram phone (+380...): '),
-        password: async () => await input.default.text('2FA password (if set): '),
-        phoneCode: async () => await input.default.text('Code from Telegram: '),
-        onError: (err) => this.opts.log('[TG] auth error', { err: String(err) }),
-      });
+    const { apiId, apiHash, session } = secrets;
+    
+    if (!apiId || !apiHash || !session) {
+      this.opts.log('[TG] Incomplete credentials, running in MOCK mode');
+      this.mockMode = true;
+      return;
+    }
 
-      await this.opts.sessionStore.save(this.client.session.save() as unknown as string);
+    this.opts.log('[TG] Credentials loaded from secure storage');
+    
+    // Use StringSession directly - NO interactive auth
+    this.session = new StringSession(session);
+    
+    this.client = new TelegramClient(this.session, apiId, apiHash, {
+      connectionRetries: 5,
+    });
+
+    try {
+      // Connect using existing session (no interactive auth)
+      await this.client.connect();
+      
+      // Verify connection
+      const me = await this.client.getMe();
       this.started = true;
-      this.opts.log('[TG] runtime started');
+      this.opts.log('[TG] Runtime started', { 
+        userId: me?.id?.toString(),
+        username: (me as any)?.username || 'unknown'
+      });
     } catch (err: any) {
-      this.opts.log('[TG] start error (may need interactive auth)', { err: String(err?.message || err) });
-      // Don't throw - allow mock mode
+      this.opts.log('[TG] Connection failed, running in MOCK mode', { 
+        err: String(err?.message || err) 
+      });
+      this.mockMode = true;
     }
   }
 
