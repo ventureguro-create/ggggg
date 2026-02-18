@@ -159,6 +159,7 @@ export class CoinGeckoAdapter {
           ids: coinId,
           vs_currencies: 'usd',
         },
+        headers: getHeaders(),
       });
       return res.data;
     });
