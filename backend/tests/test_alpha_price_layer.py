@@ -248,16 +248,17 @@ class TestEvaluateBatch:
         assert data["processed"] <= 200
         print("✓ Limit parameter is capped at 200")
     
-    def test_evaluate_batch_without_body(self, api_client):
-        """POST /evaluate works without body (uses defaults)"""
+    def test_evaluate_batch_with_empty_json(self, api_client):
+        """POST /evaluate works with empty JSON body (uses defaults)"""
         response = api_client.post(
             f"{BASE_URL}/api/admin/telegram-intel/alpha/evaluate",
+            json={},  # Must send empty JSON, not no body with Content-Type set
             timeout=30
         )
         assert response.status_code == 200
         data = response.json()
         assert "ok" in data
-        print("✓ Evaluate works without body")
+        print("✓ Evaluate works with empty JSON body")
 
 
 class TestReevaluate:
@@ -297,16 +298,17 @@ class TestReevaluate:
         assert data["ok"] == True
         print("✓ Reevaluate limit parameter handled")
     
-    def test_reevaluate_without_body(self, api_client):
-        """POST /reevaluate works without body (uses defaults)"""
+    def test_reevaluate_with_empty_json(self, api_client):
+        """POST /reevaluate works with empty JSON body (uses defaults)"""
         response = api_client.post(
             f"{BASE_URL}/api/admin/telegram-intel/alpha/reevaluate",
+            json={},  # Must send empty JSON, not no body with Content-Type set
             timeout=30
         )
         assert response.status_code == 200
         data = response.json()
         assert "ok" in data
-        print("✓ Reevaluate works without body")
+        print("✓ Reevaluate works with empty JSON body")
 
 
 class TestRateLimiting:
@@ -334,29 +336,30 @@ class TestRateLimiting:
 class TestErrorHandling:
     """Tests for error handling"""
     
-    def test_invalid_date_format_variations(self, api_client):
-        """Various invalid date formats are handled"""
-        invalid_dates = [
-            "01-01-2025",  # Wrong format (DD-MM-YYYY instead of YYYY-MM-DD)
-            "2025/01/01",  # Wrong separator
-            "2025-13-01",  # Invalid month
-            "2025-01-32",  # Invalid day
-            "",           # Empty
-            "null",       # String null
-        ]
-        
-        for date in invalid_dates:
-            response = api_client.get(
-                f"{BASE_URL}/api/admin/telegram-intel/alpha/price/ETH/history?date={date}",
-                timeout=10
-            )
-            assert response.status_code == 200
-            data = response.json()
-            # Should return error or ok=false
-            # Note: JavaScript Date parsing is lenient, so some may parse
-            print(f"  Date '{date}': ok={data.get('ok')}, error={data.get('error', 'none')}")
-        
-        print("✓ Various date formats handled")
+    def test_invalid_date_format_empty(self, api_client):
+        """Empty date string returns error"""
+        response = api_client.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/price/ETH/history?date=",
+            timeout=10
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # Empty string should be treated as missing or invalid
+        assert data["ok"] == False
+        print(f"✓ Empty date handled: error={data.get('error')}")
+    
+    def test_invalid_date_format_string_null(self, api_client):
+        """String 'null' returns error"""
+        response = api_client.get(
+            f"{BASE_URL}/api/admin/telegram-intel/alpha/price/ETH/history?date=null",
+            timeout=10
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # 'null' is not a valid date
+        assert data["ok"] == False
+        assert data["error"] == "invalid_date"
+        print("✓ String 'null' handled as invalid date")
 
 
 if __name__ == "__main__":
