@@ -51,10 +51,16 @@ export const TgOverridesModel =
 export const DEFAULT_INTEL_CONFIG = {
   key: 'intel_v1',
   version: 1,
-  weights: { base: 0.45, alpha: 0.30, cred: 0.25 },
+  weights: { base: 0.40, alpha: 0.25, cred: 0.25, netAlpha: 0.10 },
   fraud: { killSwitch: 0.75, penaltyBase: 0.20, penaltyScale: 0.60 },
   lowCred: { pivot: 55, scale: 80 },
   lowSamplePenalty: 0.25,
   credibility: { halfLifeDays: 21 },
   tiers: { S: 92, A: 80, B: 65, C: 45 },
+  netAlpha: {
+    credGateBase: 0.25,
+    credGateScale: 0.75,
+    lowNetAlphaPivot: 25,
+    lowNetAlphaPenaltyMax: 0.08,
+  },
 };
