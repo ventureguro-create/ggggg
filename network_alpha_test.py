@@ -49,17 +49,24 @@ class NetworkAlphaAPITester:
     def run_test(self, name, method, endpoint, expected_status=200, data=None, headers=None):
         """Run a single API test"""
         url = f"{self.base_url}/{endpoint}"
-        if not headers:
-            headers = {'Content-Type': 'application/json'}
+        
+        # Handle both single expected status and list of acceptable statuses
+        if isinstance(expected_status, list):
+            expected_statuses = expected_status
+        else:
+            expected_statuses = [expected_status]
         
         try:
             if method == 'GET':
                 response = requests.get(url, timeout=30)
             elif method == 'POST':
                 if data is not None:
+                    if not headers:
+                        headers = {'Content-Type': 'application/json'}
                     response = requests.post(url, json=data, headers=headers, timeout=30)
                 else:
-                    response = requests.post(url, headers=headers, timeout=30)
+                    # For POST with no body, don't set content-type to avoid the error
+                    response = requests.post(url, timeout=30)
             elif method == 'PATCH':
                 response = requests.patch(url, json=data, headers=headers, timeout=30)
             elif method == 'PUT':
@@ -67,7 +74,7 @@ class NetworkAlphaAPITester:
             else:
                 raise ValueError(f"Unsupported method: {method}")
 
-            success = response.status_code == expected_status
+            success = response.status_code in expected_statuses
             
             try:
                 response_data = response.json()
