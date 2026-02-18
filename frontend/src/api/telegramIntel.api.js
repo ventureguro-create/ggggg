@@ -81,6 +81,22 @@ export async function getChannelExplain(username) {
   return response.data;
 }
 
+// ==================== Channel Token Mentions (Public) ====================
+
+/**
+ * Get channel token mentions with returns data
+ * Used by Channel Detail Page - Token Mentions Table
+ * @param {string} username - Channel username
+ * @param {object} opts - Options { days, limit, evaluated }
+ */
+export async function getChannelTokenMentions(username, opts = {}) {
+  const { days = 90, limit = 100, evaluated = false } = opts;
+  const response = await api.get(`${API_PUBLIC}/channel/${username}/mentions`, {
+    params: { days, limit, evaluated },
+  });
+  return response.data;
+}
+
 // ==================== Alpha v2 ====================
 
 export async function getAlphaLeaderboard(limit = 20) {
