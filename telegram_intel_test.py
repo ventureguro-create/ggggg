@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 class TelegramIntelTester:
-    def __init__(self, base_url="https://tg-backend-dev.preview.emergentagent.com"):
+    def __init__(self, base_url="https://crypto-alpha.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
@@ -440,7 +440,7 @@ def main():
     print("Testing Alpha v2, Credibility, Intel Ranking, Governance & Explainability")
     print()
     
-    tester = TelegramIntelTester("https://tg-backend-dev.preview.emergentagent.com")
+    tester = TelegramIntelTester("https://crypto-alpha.preview.emergentagent.com")
     
     try:
         success = tester.run_comprehensive_tests()

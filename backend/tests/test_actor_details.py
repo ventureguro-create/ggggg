@@ -9,7 +9,7 @@ import requests
 import os
 
 # Get the base URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://tg-discovery-preview.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://crypto-alpha.preview.emergentagent.com')
 
 # Test actors from seed data
 TEST_ACTORS = ['crypto_whale_alerts', 'moon_signals', 'gem_hunter_pro']
