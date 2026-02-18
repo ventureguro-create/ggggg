@@ -52,6 +52,7 @@ export function Sidebar({ globalState }) {
   // Navigation items with groups support
   const navItems = [
     { path: '/market', label: 'Market', icon: '📊' },
+    { path: '/telegram', label: 'Telegram', icon: '📱' },
     { path: '/tokens', label: 'Tokens', icon: '🪙' },
     { path: '/wallets', label: 'Wallets', icon: '👛' },
     { path: '/entities', label: 'Entities', icon: '🏢' },
