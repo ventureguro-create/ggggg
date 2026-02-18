@@ -122,10 +122,11 @@ class TelegramDiscoveryTester:
         
         success, seed_response, status_code = self.run_test("Seed New Channel", "POST", "api/telegram/channels/seed", 200, seed_data)
         
-        # Store channelId for further tests
-        self.test_channel_id = None
+        # Store username for further tests
+        self.test_username = None
         if success and isinstance(seed_response, dict) and 'channelId' in seed_response:
             self.test_channel_id = seed_response['channelId']
+            self.test_username = seed_data["username"]
             print(f"   Created channel ID: {self.test_channel_id}")
             
             # Extract username from channelId (remove 'seed_' prefix)
