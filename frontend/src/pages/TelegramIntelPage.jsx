@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { Search, RefreshCw, TrendingUp, AlertTriangle, Zap, MessageCircle } from 'lucide-react';
 import * as telegramApi from '../api/telegramIntel.api';
 import TokenMentionsTable from '../components/telegram/TokenMentionsTable';
+import NetworkEvidenceTable from '../components/telegram/NetworkEvidenceTable';
+import ComparePanel from '../components/telegram/ComparePanel';
 
 export default function TelegramIntelPage() {
   const [health, setHealth] = useState(null);
@@ -18,6 +20,10 @@ export default function TelegramIntelPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [tokenMentions, setTokenMentions] = useState(null);
   const [mentionsLoading, setMentionsLoading] = useState(false);
+  const [networkEvidence, setNetworkEvidence] = useState(null);
+  const [evidenceLoading, setEvidenceLoading] = useState(false);
+  const [compareData, setCompareData] = useState(null);
+  const [compareLoading, setCompareLoading] = useState(false);
 
   // Load health and stats on mount
   useEffect(() => {
