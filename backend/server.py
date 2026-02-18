@@ -19,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-NODE_BACKEND_URL = os.environ.get("NODE_BACKEND_URL", "http://localhost:8003")
+NODE_BACKEND_URL = os.environ.get("NODE_BACKEND_URL", "http://localhost:8002")
 
 # MongoDB connection for direct Python access if needed
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
