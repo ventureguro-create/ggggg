@@ -296,4 +296,173 @@ export class NetworkAlphaService {
 
     return { ok: true, count: items.length, items };
   }
+
+  /**
+   * Get channel's network alpha evidence - tokens where channel was early
+   * Block UI-4: Shows WHY the networkAlphaScore is what it is
+   */
+  async getChannelNetworkEvidence(username: string, limit = 25) {
+    const u = username.toLowerCase();
+
+    // Find tokens where this channel appears in firstMentions
+    const tokens = await TgNetworkAlphaTokenModel.find({
+      'firstMentions.username': u,
+      'success.qualified': true,
+    })
+      .sort({ 'success.max7dReturn': -1 })
+      .limit(limit * 2) // Fetch more to ensure we have enough after processing
+      .select('-_id -__v')
+      .lean();
+
+    const items = [];
+
+    for (const t of tokens) {
+      const sorted = [...(t.firstMentions || [])].sort(
+        (a: any, b: any) => a.delayHours - b.delayHours
+      );
+
+      const idx = sorted.findIndex((x: any) => x.username === u);
+      if (idx === -1) continue;
+
+      const cohortSize = t.channelsCount || sorted.length;
+      const earlyRank = idx + 1;
+      const percentile = cohortSize > 0 ? earlyRank / cohortSize : 1;
+      const mention = sorted[idx] as any;
+
+      items.push({
+        token: t.token,
+        earlyRank,
+        cohortSize,
+        delayHours: Number(mention.delayHours.toFixed(1)),
+        percentile: Number(percentile.toFixed(3)),
+        return7d: t.success?.max7dReturn ?? 0,
+        isHit: (t.success?.max7dReturn ?? 0) >= 20,
+        mentionedAt: mention.mentionedAt,
+      });
+    }
+
+    // Sort by percentile (best first), then by return
+    const sorted = items
+      .sort((a, b) => {
+        if (a.percentile !== b.percentile) return a.percentile - b.percentile;
+        return b.return7d - a.return7d;
+      })
+      .slice(0, limit);
+
+    // Compute summary stats
+    const totalHits = sorted.filter((x) => x.isHit).length;
+    const avgPercentile =
+      sorted.length > 0
+        ? sorted.reduce((s, x) => s + x.percentile, 0) / sorted.length
+        : null;
+    const firstPlaces = sorted.filter((x) => x.earlyRank === 1).length;
+
+    return {
+      ok: true,
+      username: u,
+      count: sorted.length,
+      summary: {
+        totalTokens: sorted.length,
+        hitsCount: totalHits,
+        avgPercentile: avgPercentile !== null ? Number(avgPercentile.toFixed(3)) : null,
+        firstPlaces,
+      },
+      items: sorted,
+    };
+  }
+
+  /**
+   * Get channel's position comparison in the network
+   * Block UI-5: Shows WHERE the channel stands relative to others
+   */
+  async getChannelCompare(username: string) {
+    const u = username.toLowerCase();
+
+    // Get all channels sorted by intelScore
+    const { TgIntelRankingModel } = await import('../models/tg.intel_ranking.model.js');
+
+    const all = await TgIntelRankingModel.find({})
+      .sort({ intelScore: -1 })
+      .select('username intelScore tier components')
+      .lean();
+
+    const total = all.length;
+    const index = all.findIndex((x: any) => x.username === u);
+
+    if (index === -1) {
+      return { ok: false, error: 'not_found' };
+    }
+
+    const current = all[index] as any;
+    const rank = index + 1;
+    const percentile = rank / total;
+
+    // Get neighbors
+    const prev = index > 0 ? all[index - 1] : null;
+    const next = index < total - 1 ? all[index + 1] : null;
+    const prev2 = index > 1 ? all[index - 2] : null;
+    const next2 = index < total - 2 ? all[index + 2] : null;
+
+    // Tier thresholds (from intel ranking config)
+    const tierSThreshold = 85;
+    const tierAThreshold = 72;
+    const tierBThreshold = 55;
+
+    // Calculate gaps
+    const gapUp = prev ? (prev as any).intelScore - current.intelScore : null;
+    const gapDown = next ? current.intelScore - (next as any).intelScore : null;
+    const distanceToTierS = current.tier === 'S' ? 0 : tierSThreshold - current.intelScore;
+
+    // Peer stats (same tier)
+    const peers = all.filter((x: any) => x.tier === current.tier);
+    const peerAvg =
+      peers.length > 0
+        ? peers.reduce((s: number, x: any) => s + x.intelScore, 0) / peers.length
+        : current.intelScore;
+
+    const formatNeighbor = (n: any) =>
+      n
+        ? {
+            username: n.username,
+            intelScore: Number(n.intelScore.toFixed(1)),
+            tier: n.tier,
+          }
+        : null;
+
+    return {
+      ok: true,
+      username: u,
+      current: {
+        intelScore: Number(current.intelScore.toFixed(1)),
+        tier: current.tier,
+        components: current.components,
+      },
+      position: {
+        rank,
+        total,
+        percentile: Number(percentile.toFixed(3)),
+        percentileLabel: `Top ${(percentile * 100).toFixed(1)}%`,
+      },
+      gaps: {
+        up: gapUp !== null ? Number(gapUp.toFixed(2)) : null,
+        down: gapDown !== null ? Number(gapDown.toFixed(2)) : null,
+        toTierS: Number(distanceToTierS.toFixed(1)),
+        toTierA: current.tier !== 'S' && current.tier !== 'A' 
+          ? Number((tierAThreshold - current.intelScore).toFixed(1)) 
+          : null,
+      },
+      neighbors: {
+        prev: formatNeighbor(prev),
+        next: formatNeighbor(next),
+        prev2: formatNeighbor(prev2),
+        next2: formatNeighbor(next2),
+      },
+      peerContext: {
+        tier: current.tier,
+        peersInTier: peers.length,
+        tierAverage: Number(peerAvg.toFixed(1)),
+        vsAverage: Number((current.intelScore - peerAvg).toFixed(1)),
+      },
+    };
+  }
 }
