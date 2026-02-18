@@ -1,8 +1,8 @@
 /**
  * Intel Ranking Service
- * Phase 3 Step 5: Unified Intelligence Score
+ * Phase 3 Step 5 + 4.2: Unified Intelligence Score with NetworkAlpha
  *
- * Combines: BaseScore + AlphaScore + CredibilityScore + FraudRisk
+ * Combines: BaseScore + AlphaScore + CredibilityScore + NetworkAlphaScore + FraudRisk
  * With governance overrides applied
  */
 import { TgAlphaScoreModel } from '../models/tg.alpha_score.model.js';
@@ -10,6 +10,7 @@ import { TgCredibilityModel } from '../models/tg.credibility.model.js';
 import { TgFraudSignalModel } from '../models/tg.fraud_signal.model.js';
 import { TgMetricsWindowModel } from '../models/tg.metrics_window.model.js';
 import { TgIntelRankingModel } from '../models/tg.intel_ranking.model.js';
+import { TgNetworkAlphaChannelModel } from '../models/tg.network_alpha_channel.model.js';
 import { GovernanceService } from '../governance/governance.service.js';
 import { TgOverridesModel } from '../governance/governance.model.js';
 
@@ -48,6 +49,7 @@ export class IntelRankingService {
     const cred = await TgCredibilityModel.findOne({ username: u }).lean();
     const fraud = await TgFraudSignalModel.findOne({ username: u }).lean();
     const m30 = await TgMetricsWindowModel.findOne({ username: u, window: '30d' }).lean();
+    const net = await TgNetworkAlphaChannelModel.findOne({ username: u }).lean();
 
     // Base score from metrics (reach/engagement) - simplified
     const medianViews = Number((m30 as any)?.medianViews ?? 0);
@@ -65,11 +67,13 @@ export class IntelRankingService {
 
     const alphaScore = Number((alpha as any)?.alphaScore ?? 0);
     const credibilityScore = Number((cred as any)?.credibilityScore ?? 0);
+    const networkAlphaScore = Number((net as any)?.networkAlphaScore ?? 0);
 
     // Weights from config
     const wBase = config.weights.base;
     const wAlpha = config.weights.alpha;
     const wCred = config.weights.cred;
+    const wNet = config.weights.netAlpha ?? 0;
 
     // Fraud penalty
     const kill = fraudRisk >= config.fraud.killSwitch;
@@ -87,15 +91,37 @@ export class IntelRankingService {
     const lowSamplePenalty =
       (alpha as any)?.breakdown?.reason === 'low_sample' ? config.lowSamplePenalty : 0;
 
+    // Low network alpha penalty (optional)
+    let lowNetAlphaPenalty = 0;
+    if (wNet > 0 && networkAlphaScore > 0) {
+      const pivot = config.netAlpha?.lowNetAlphaPivot ?? 25;
+      const maxP = config.netAlpha?.lowNetAlphaPenaltyMax ?? 0.08;
+      lowNetAlphaPenalty =
+        Math.max(0, Math.min(1, (pivot - networkAlphaScore) / pivot)) * maxP;
+    }
+
     // Cred gating alpha: alphaEffective = alpha × (0.35 + 0.65 × cred/100)
     const alphaEffective = alphaScore * (0.35 + 0.65 * (credibilityScore / 100));
 
-    // Raw score
-    const raw = wBase * baseScore + wAlpha * alphaEffective + wCred * credibilityScore;
+    // Cred-gated NetworkAlpha: don't boost garbage channels
+    const credGate =
+      (config.netAlpha?.credGateBase ?? 0.25) +
+      (config.netAlpha?.credGateScale ?? 0.75) * (credibilityScore / 100);
+    const networkAlphaEffective = networkAlphaScore * clamp01(credGate);
 
-    // Combined penalty
+    // Raw score (now includes networkAlpha)
+    const raw =
+      wBase * baseScore +
+      wAlpha * alphaEffective +
+      wCred * credibilityScore +
+      wNet * networkAlphaEffective;
+
+    // Combined penalty (updated weights)
     let penaltyCombined =
-      0.55 * fraudPenalty + 0.30 * lowCredPenalty + 0.15 * lowSamplePenalty;
+      0.52 * fraudPenalty +
+      0.28 * lowCredPenalty +
+      0.12 * lowSamplePenalty +
+      0.08 * lowNetAlphaPenalty;
 
     // Apply penalty multiplier override
     if ((override as any)?.penaltyMultiplier != null) {
@@ -124,6 +150,7 @@ export class IntelRankingService {
         baseScore,
         alphaScore,
         credibilityScore,
+        networkAlphaScore,
         fraudRisk,
         reach: medianViews,
         engagement: forwardRate,
@@ -132,10 +159,15 @@ export class IntelRankingService {
         fraudPenalty,
         lowCredPenalty,
         lowSamplePenalty,
+        lowNetAlphaPenalty,
       },
       raw,
       alphaEffective,
+      networkAlphaEffective,
+      credGate,
+      weights: { wBase, wAlpha, wCred, wNet },
       penaltyCombined,
+      configKey: config.key,
       configVersion: config.version ?? 1,
       override: override ?? null,
     });
