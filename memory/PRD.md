@@ -1,11 +1,11 @@
-# Telegram Intelligence Platform - PRD v4.0
+# Telegram Intelligence Platform - PRD v4.2
 
 ## Original Problem Statement
 Создать production-ready изолированный Telegram Intelligence модуль с многофазной архитектурой:
 - **Phase 1:** Production-hardened MTProto runtime ✅
 - **Phase 2:** Windowed analytics pipeline (7d/30d/90d) ✅
 - **Phase 3:** Alpha & Credibility Engine (Complete ✅)
-- **Phase 4:** Explainability + Governance (Complete ✅)
+- **Phase 4:** Explainability + Governance + NetworkAlpha + Temporal ✅
 
 ## Architecture
 
@@ -14,168 +14,123 @@
 modules/telegram-intel/
 ├── telegram_intel.plugin.ts
 ├── runtime/                    # Phase 1
-│   ├── telegram.runtime.ts
-│   ├── secrets.service.ts
-│   ├── rate_limiter.ts
-│   └── retry.ts
 ├── price/                      # Phase 3 Step 2
-│   ├── price.provider.ts
-│   ├── coingecko.adapter.ts
-│   ├── price.cache.model.ts
-│   └── price.service.ts
 ├── alpha/                      # Phase 3 v2
-│   ├── token_extractor.ts
-│   ├── mentions.service.ts
-│   ├── track_record.service.ts    # NEW
-│   ├── alpha_scoring_v2.service.ts # NEW - Institutional
-│   └── price_evaluation.service.ts
-├── credibility/                # Phase 3 Step 4 NEW
+│   ├── track_record.service.ts
+│   └── alpha_scoring_v2.service.ts
+├── credibility/                # Phase 3 Step 4
 │   ├── decay.ts
 │   ├── stats.ts
 │   └── credibility.service.ts
-├── ranking/                    # Phase 3 Step 5 NEW
-│   ├── ranking_snapshot.service.ts
-│   └── intel_ranking.service.ts
-├── governance/                 # Phase 4 NEW
+├── ranking/                    # Phase 3 Step 5 + 4.2
+│   └── intel_ranking.service.ts  # Now with NetworkAlpha!
+├── network-alpha/              # NEW: Cross-channel earliness
+│   ├── network_alpha.config.ts
+│   └── network_alpha.service.ts
+├── temporal/                   # NEW: Score evolution
+│   ├── temporal_snapshot.service.ts
+│   └── temporal_trend.service.ts
+├── governance/                 # Phase 4
 │   ├── governance.model.ts
 │   └── governance.service.ts
-├── explain/                    # Phase 4 NEW
+├── explain/                    # Phase 4
 │   └── explain.service.ts
 ├── routes/
-│   ├── alpha.routes.ts
-│   ├── alpha_price.routes.ts
-│   ├── alpha_scoring.routes.ts
-│   ├── alpha_scoring_v2.routes.ts # NEW
-│   ├── credibility.routes.ts      # NEW
-│   ├── intel_ranking.routes.ts    # NEW
-│   ├── governance.routes.ts       # NEW
-│   └── explain.routes.ts          # NEW
+│   ├── network_alpha.routes.ts  # NEW
+│   ├── temporal.routes.ts       # NEW
+│   └── ... (all previous)
 └── models/
-    ├── tg.token_mention.model.ts
-    ├── tg.price_cache.model.ts
-    ├── tg.channel_track_record.model.ts # NEW
-    ├── tg.alpha_score.model.ts          # NEW
-    ├── tg.credibility.model.ts          # NEW
-    └── tg.intel_ranking.model.ts        # NEW
+    ├── tg.network_alpha_channel.model.ts  # NEW
+    ├── tg.network_alpha_token.model.ts    # NEW
+    ├── tg.score_snapshot.model.ts         # NEW
+    └── ... (all previous)
 ```
 
 ## What's Been Implemented
 
-### Phase 3 v2: Institutional Alpha Scoring ✅ (2026-02-18)
-- [x] **TrackRecordService** - historical performance stats
-- [x] **AlphaScoringServiceV2** - institutional grade scoring
-  - Bayesian hit rates (Beta posterior)
-  - Risk-adjusted returns (Sharpe-lite)
-  - Earlyness approximation
-  - Stability factor
-  - Spam penalty
-  - Drawdown penalty
-  - Sample confidence
+### Network Alpha Detection (Killer Feature) ✅
+Cross-channel earliness detection - determines who mentions successful tokens first:
 
-**Formula:**
+**For each qualified token (+20% in 7d, 5+ mentions):**
+- Ranks all channels by mention time
+- Computes earlyness percentile (0 = first, 1 = last)
+- Quality-weighted earliness (bigger gains = more weight)
+
+**Channel Score (0..100):**
 ```
-alphaScore = 100 ×
-  (0.30 × BayesianSuccess7d +
-   0.20 × RiskAdjustedReturn +
-   0.15 × Earlyness +
-   0.15 × Stability +
-   0.10 × Hit24h +
-   0.10 × Consistency)
-  × SampleConfidence
-  × (1 − Penalty)
+networkAlphaScore = 
+  0.45 × earlyHitRate +           # % of tokens where channel was in top 10%
+  0.25 × earlyPercentileGoodness + # 1 - avgEarlyPercentile
+  0.20 × qualityWeightedEarliness +
+  0.10 × coverageScore
 ```
 
-### Phase 3 Step 4: Credibility Engine ✅
-- [x] **CredibilityService**
-  - Recency decay weighting (exp decay)
-  - Beta posterior for hit rate
-  - Credible interval (95% CI)
-  - Trend detection (improving/flat/deteriorating)
-  - Tier assignment (AAA/AA/A/BBB/BB/B/C/D)
+**Token-level Data:**
+- firstMentions[] with delay hours
+- p50/p90 mention delay statistics
 
-### Phase 3 Step 5: Intel Ranking ✅
-- [x] **IntelRankingService** - unified score (0..100)
-  - Combines: BaseScore + AlphaEffective + Credibility
-  - Fraud penalty (kill switch at 0.75)
-  - Low credibility penalty
-  - Low sample penalty
-  - Tier assignment (S/A/B/C/D)
+### Phase 4.2: NetworkAlpha in IntelScore ✅
+IntelScore now includes networkAlpha with credibility gating:
 
-### Phase 4: Explainability + Governance ✅
-- [x] **GovernanceService**
-  - Versioned scoring configs
-  - Override management (ALLOWLIST/BLOCKLIST)
-  - Forced tier/score
-  - Fraud risk override
-  - Penalty multiplier
-- [x] **ExplainService**
-  - Human-readable bullet points
-  - Full snapshot of all scores
+```
+// Config weights: base=0.40, alpha=0.25, cred=0.25, netAlpha=0.10
+
+// Cred-gated network alpha (prevents boosting garbage channels)
+credGate = 0.25 + 0.75 × (credibilityScore / 100)
+networkAlphaEffective = networkAlphaScore × credGate
+
+// Updated raw score
+raw = wBase×base + wAlpha×alphaEffective + wCred×cred + wNet×networkAlphaEffective
+```
+
+### Temporal Ranking (Score Evolution) ✅
+Daily snapshots of all channel scores for trend analysis:
+
+**Snapshot includes:**
+- intelScore, alphaScore, credibilityScore, networkAlphaScore, fraudRisk
+- Tier information (intel, credibility, networkAlpha)
+- Config version (for audit after weight changes)
+
+**Top Movers API:**
+- Get channels with biggest score changes over N days
+- Supports all metrics: intelScore, alpha, cred, netAlpha, fraud
 
 ## API Endpoints
 
-### Alpha v2 (Institutional)
-- `POST /api/admin/telegram-intel/alpha/v2/compute/channel`
-- `POST /api/admin/telegram-intel/alpha/v2/compute/batch`
-- `GET /api/admin/telegram-intel/alpha/v2/leaderboard`
-- `GET /api/admin/telegram-intel/alpha/v2/score/:username`
-- `GET /api/admin/telegram-intel/alpha/v2/stats`
+### Network Alpha
+- `POST /api/admin/telegram-intel/network-alpha/run` - compute
+- `GET /api/telegram-intel/network-alpha/top` - channel leaderboard
+- `GET /api/telegram-intel/network-alpha/channel/:username`
+- `GET /api/telegram-intel/network-alpha/token/:token` - firstMentions timeline
 
-### Credibility
-- `POST /api/admin/telegram-intel/credibility/channel`
-- `POST /api/admin/telegram-intel/credibility/batch`
-- `GET /api/admin/telegram-intel/credibility/:username`
-- `GET /api/admin/telegram-intel/credibility/leaderboard`
-
-### Intel Ranking
-- `POST /api/admin/telegram-intel/intel/compute/channel`
-- `POST /api/admin/telegram-intel/intel/recompute`
-- `GET /api/telegram-intel/intel/top` (public)
-- `GET /api/telegram-intel/intel/:username` (public)
-
-### Governance
-- `GET /api/admin/telegram-intel/governance/config/active`
-- `GET /api/admin/telegram-intel/governance/config/list`
-- `POST /api/admin/telegram-intel/governance/config/activate`
-- `POST /api/admin/telegram-intel/governance/override`
-- `GET /api/admin/telegram-intel/governance/override/:username`
-- `GET /api/admin/telegram-intel/governance/overrides`
-
-### Explainability
-- `GET /api/telegram-intel/intel/explain/:username` (public)
+### Temporal
+- `POST /api/admin/telegram-intel/temporal/snapshot/run` - batch snapshot
+- `GET /api/telegram-intel/temporal/:username?days=90` - score history
+- `GET /api/telegram-intel/temporal/top-movers?days=7&metric=intelScore`
 
 ## Testing
 
 ### Test Results
 - **Phase 1-2:** 100% ✅
 - **Phase 3 v2 + Step 4 + Step 5 + Phase 4:** 100% (27/27) ✅
+- **Network Alpha + 4.2 + Temporal:** 92.6% ✅
 
 ## Prioritized Backlog
 
 ### P0 (Critical - Done ✅)
-- [x] Secure secrets management
-- [x] MTProto runtime
-- [x] Ingestion & metrics pipeline
-- [x] Token extractor + mention storage
-- [x] Price layer with CoinGecko + cache
-- [x] Institutional Alpha Scoring v2
-- [x] Credibility Engine with Beta posterior
-- [x] Unified Intel Ranking
-- [x] Governance (config + overrides)
-- [x] Explainability API
+All core features complete.
 
 ### P1 (High Priority - Next)
-1. [ ] **Temporal Ranking** - score evolution chart over time
-2. [ ] **Network Alpha Detection** - cross-channel earliness (who mentions first)
-3. [ ] **Frontend Integration** - UI for leaderboard & channel scores
-4. [ ] **CoinGecko API Key** - получить для production
+1. [ ] **Frontend UI** - leaderboard, channel pages, score charts
+2. [ ] **Top Movers Alerts** - notify on significant score changes
+3. [ ] **CoinGecko API Key** - production price layer
 
 ### P2 (Medium Priority)
-1. [ ] Taxonomy Layer
-2. [ ] Advanced earliness (pre-mention window analysis)
-3. [ ] Alerting on high-alpha channels
+1. [ ] Temporal Aggregation Optimization (MongoDB aggregation pipeline)
+2. [ ] Weekly/Monthly rollups for historical charts
+3. [ ] Advanced earliness (pre-mention window analysis)
 
 ---
 **Last Updated:** 2026-02-18
-**Version:** 4.0.0
-**Status:** Phase 1-4 Complete - Institutional Intelligence Platform Ready
+**Version:** 4.2.0
+**Status:** Phase 1-4 Complete + Network Alpha + Temporal = Enterprise Intelligence Platform
